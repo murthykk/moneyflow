@@ -2,11 +2,16 @@
 
 
 import copy
+import storage_lib
 
 
 class AccountList(object):
   """Stores a list of accounts."""
-  _account_list = []
+  _accounts = []
+
+  def __init__(self):
+    self._storage = storage_lib.GetStorageObject("accounts")
+    self._accounts = self.ReadAll()
 
   def Save(self):
     """Saves account information to storage."""
@@ -18,10 +23,6 @@ class AccountList(object):
 
   def GetCopyOfList(self):
     return copy.deepcopy(self._account_list)
-
-  def _GetStorage(self):
-    self.
-
 
 
 class Account(object):

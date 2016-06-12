@@ -7,9 +7,9 @@ import gflags as flags
 STORAGE_TYPES = ["csv"]
 
 flags.DEFINE_enum(
-    "storage_type", STORAGE_TYPES, "Type of backend storage to use.")
+    "storage_type", "csv", STORAGE_TYPES, "Type of backend storage to use.")
 flags.DEFINE_string(
-    "storage_config_file", None,
+    "storage_config_file", "storage_config.json",
     "Base directory where all CSVs will be stored.")
 flags.DEFINE_string(
     "csv_base_dir", None, "Base directory where all CSVs will be stored.")
@@ -20,7 +20,7 @@ FLAGS = flags.FLAGS
 
 def GetStorageObject(storage_name):
   """Returns a storage interface object, given a storage config object."""
-  confg = StorageConfig.fromconfigfile(FLAGS.storage_config_file)
+  config = StorageConfig.fromconfigfile(FLAGS.storage_config_file, storage_name)
   if FLAGS.storage_type == "csv":
     return CsvStorage(config)
 
@@ -61,6 +61,7 @@ class Storage(object):
 
   def ValidateRow(*args, **kwargs):
     # TODO
+    pass
 
   def _ReadRows(self):
     """Inner generator."""
@@ -71,7 +72,7 @@ class CsvStorage(Storage):
   def __init__(self, csv_config):
     self._file_path = csv_config.rel_path
     super(CsvStorage, self).__init__(
-        csv_config.GetCsvName(), csv_config.columns)
+        csv_config.rel_path, csv_config.columns)
     # TODO: Read the entire file into memory
 
   def BufferRowForWrite(self, *args, **kwargs):
