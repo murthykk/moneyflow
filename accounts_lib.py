@@ -1,5 +1,6 @@
 """Objects for managing account information."""
 
+
 import copy
 
 
@@ -9,20 +10,17 @@ class AccountList(object):
 
   def Save(self):
     """Saves account information to storage."""
-    raise NotImplementedError("Storage functions must be implemented in "
-        "subclasses.")
+    # TODO
 
-  def Read(self):
+  def ReadAll(self):
     """Reads account information from storage."""
-    raise NotImplementedError("Storage functions must be implemented in "
-        "subclasses.")
+    # TODO
 
   def GetCopyOfList(self):
     return copy.deepcopy(self._account_list)
 
   def _GetStorage(self):
-    raise NotImplementedError("Storage object must be instantiated in "
-        "subclasses.")
+    self.
 
 
 
