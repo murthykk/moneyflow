@@ -1,0 +1,14 @@
+{
+  "accounts": {
+    "rel_path": "accounts.csv",
+    "columns": ["account_name", "account_number"]
+  },
+  "transactions": {
+    "rel_path": "transactions.csv",
+    "columns": ["account_name", "date", "transaction_name", "amount"]
+  },
+  "categories": {
+    "rel_path": "categories.csv",
+    "columns": ["transaction_name", "display_name", "category"]
+  }
+}
