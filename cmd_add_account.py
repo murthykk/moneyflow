@@ -5,8 +5,8 @@ from google.apputils import appcommands
 import gflags as flags
 
 
-class CmdImport(appcommands.Cmd):
+class CmdAddAccount(appcommands.Cmd):
   """Import command."""
 
   def Run(self, argv):
-    print "Import"
+    print "Add account"

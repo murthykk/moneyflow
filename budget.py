@@ -7,6 +7,7 @@ import shutil
 import argparse
 
 from google.apputils import appcommands
+import cmd_add_account
 import gflags as flags
 
 
@@ -14,7 +15,7 @@ def main(argv):
   # TODO: Before jumping in to the app, set up the program by asking for a
   # password and reading transactions data.
   # Add a financial account.
-  appcommands.AddCmd("add_account", CmdAddAccount)
+  appcommands.AddCmd("add_account", cmd_add_account.CmdAddAccount)
   # Import transaction data into an account.
   #appcommands.AddCmd("import", CmdImport)
   # Categorize transaction data.
