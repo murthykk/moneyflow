@@ -13,7 +13,7 @@ flags.DEFINE_string(
     "storage_config_file", "storage_config.json",
     "Base directory where all CSVs will be stored.")
 flags.DEFINE_string(
-    "csv_base_dir", None, "Base directory where all CSVs will be stored.")
+    "csv_base_dir", "csvdata", "Base directory where all CSVs will be stored.")
 
 
 FLAGS = flags.FLAGS
@@ -56,7 +56,7 @@ class Storage(object):
     """Buffers up rows in memory that should be written."""
     raise NotImplementedError
 
-  def WriteBufferedRows(self, *args, **kwargs):
+  def WriteBufferedRows(self):
     """Writes all buffered up rows to storage."""
     raise NotImplementedError
 
@@ -87,7 +87,7 @@ class CsvStorage(Storage):
     """Buffers up rows in memory that should be written."""
     raise NotImplementedError
 
-  def WriteBufferedRows(self, *args, **kwargs):
+  def WriteBufferedRows(self):
     """Writes all buffered up rows to storage."""
     raise NotImplementedError
 

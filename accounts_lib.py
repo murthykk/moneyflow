@@ -15,20 +15,19 @@ class AccountList(object):
 
   def Save(self):
     """Saves account information to storage."""
-    # TODO
+    for account in self._accounts:
+      if account.is_new:
+        self._storage.BufferRowForWrite(account.todict())
+    self._storage.WriteBufferedRows()
 
   def ReadAll(self):
     """Reads account information from storage."""
-    # TODO
-    return []
+    return [Account.fromdict(row) for row in self._storage.GetAllRows()]
 
   def Accounts(self):
     """Generator that returns account information."""
     for account in self._accounts:
       yield account
-
-  def GetCopyOfList(self):
-    return copy.deepcopy(self._account_list)
 
 
 class Account(object):
@@ -36,24 +35,19 @@ class Account(object):
 
   def __init__(self, name, number):
     """Instantiate an account given the account parameters."""
-    self._name = name
-    self._number = number
+    self.name = name
+    self.number = number
+    self.is_new = False
 
-  def GetName(self):
-    """Returns the account name."""
-    return self._name
+  def todict(self):
+    return {"account_name": self.name, "account_number": self.number}
 
-  def GetNumber(self):
-    """Returns the account number."""
-    return self._number
+  def tolist(self):
+    return [self.name, self.number]
 
   @classmethod
   def fromdict(cls, row):
     return cls(row["account_name"], row["account_number"])
-
-  @classmethod
-  def tolist(cls):
-    return [cls._name, cls._number]
 
   @classmethod
   def getlistheadings(cls, name_str, number_str):

@@ -14,6 +14,16 @@ class CmdAddAccount(appcommands.Cmd):
     accounts = accounts_lib.AccountList()
     print "Current accounts:"
     self.PrintAccounts(accounts)
+    # TODO: Gather account info from user
+    input_account_name = "test"
+    input_account_number = "3242343"
+    # TODO: Add account to AccountList
+    acccounts.Add(
+        accounts_lib.Account(input_account_name, input_account_number))
+    print "New set of accounts:"
+    self.PrintAccounts(accounts)
+    # TODO: Prompt user for confirmation
+    accounts.Save()
 
   def PrintAccounts(self, accounts):
     """Print account information in a table. accounts is an AccountList."""
