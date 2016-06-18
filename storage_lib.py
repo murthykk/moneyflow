@@ -6,6 +6,7 @@ import gflags as flags
 
 STORAGE_TYPES = ["csv"]
 
+
 flags.DEFINE_enum(
     "storage_type", "csv", STORAGE_TYPES, "Type of backend storage to use.")
 flags.DEFINE_string(
@@ -62,6 +63,13 @@ class Storage(object):
   def ValidateRow(*args, **kwargs):
     # TODO
     pass
+
+  def __iter__(self):
+    return self
+
+  def next(self):
+    for row in self._ReadRows():
+      yield row
 
   def _ReadRows(self):
     """Inner generator."""

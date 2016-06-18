@@ -20,6 +20,12 @@ class AccountList(object):
   def ReadAll(self):
     """Reads account information from storage."""
     # TODO
+    return []
+
+  def Accounts(self):
+    """Generator that returns account information."""
+    for account in self._accounts:
+      yield account
 
   def GetCopyOfList(self):
     return copy.deepcopy(self._account_list)
@@ -45,4 +51,10 @@ class Account(object):
   def fromdict(cls, row):
     return cls(row["account_name"], row["account_number"])
 
+  @classmethod
+  def tolist(cls):
+    return [cls._name, cls._number]
 
+  @classmethod
+  def getlistheadings(cls, name_str, number_str):
+    return [name, number]
