@@ -60,10 +60,6 @@ class Storage(object):
     """Writes all buffered up rows to storage."""
     raise NotImplementedError
 
-  def ValidateRow(*args, **kwargs):
-    # TODO
-    pass
-
   def __iter__(self):
     return self
 
