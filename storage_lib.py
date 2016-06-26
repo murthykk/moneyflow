@@ -21,7 +21,7 @@ FLAGS = flags.FLAGS
 
 def GetStorageTable(table_name):
   """Returns a storage interface object, given a storage config object."""
-  config = StorageConfig.fromconfigfile(FLAGS.storage_config_file, storage_name)
+  config = StorageConfig.fromconfigfile(FLAGS.storage_config_file, table_name)
   if FLAGS.storage_type == "csv":
     return CsvTable(config)
 
