@@ -10,7 +10,7 @@ class AccountList(object):
   _accounts = []
 
   def __init__(self):
-    self._storage = storage_lib.GetStorageObject("accounts")
+    self._storage = storage_lib.GetStorageTable("accounts")
     self._accounts = self.ReadAll()
 
   def Save(self):

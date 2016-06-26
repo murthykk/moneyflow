@@ -19,11 +19,15 @@ flags.DEFINE_string(
 FLAGS = flags.FLAGS
 
 
-def GetStorageObject(storage_name):
+def GetStorageTable(table_name):
   """Returns a storage interface object, given a storage config object."""
   config = StorageConfig.fromconfigfile(FLAGS.storage_config_file, storage_name)
   if FLAGS.storage_type == "csv":
-    return CsvStorage(config)
+    return CsvTable(config)
+
+
+class Error(Exception):
+  """Exception type for this module."""
 
 
 class StorageConfig(object):
@@ -39,52 +43,170 @@ class StorageConfig(object):
     return cls(config_json[storage_name])
 
 
-class Storage(object):
-  """Storage base class."""
+class StorageTable(object):
+  """Class to interface with a storage table."""
+
   def __init__(self, table_name, columns):
+    """Constructor.
+
+    Args:
+      table_name: Name of the table.
+      columns: List of unique column names in the table.
+
+    Raises:
+      ValueError: If column names are not unique.
+    """
     self._table_name = table_name
+    # Check if column names are duplicated
+    if len(set(columns)) != len(columns):
+      raise ValueError("Column names not unique.")
     self._columns = columns
     self._buffer = []
 
   def WriteRow(self, *args, **kwargs):
-    pass
+    """Writes row to storage.
+
+    See _ValidateRow for rules on *args and **kwargs.
+
+    Args:
+      args: The row to write, as positional arguments.
+      kwargs: The row to write, as keyword arguments.
+
+    Raises:
+      ValueError: If the inputs are invalid, or if both args/kwargs are
+        specified.
+      Error: If the write failed.
+    """
+    _tmp_buffer = self._buffer
+    self.ResetWriteBuffer()
+    self.BufferRowForWrite(*args, **kwargs)
+    try:
+      self.WriteBufferedRows()
+    finally:
+      self._buffer = _tmp_buffer
 
   def GetAllRows(self):
-    """Return all rows as a list of dicts."""
+    """Return all rows as a list of dicts.
+
+    Returns:
+      A list of dicts, with each row's data keyed by the column names.
+    """
+    return list(self._ReadRows())
 
   def BufferRowForWrite(self, *args, **kwargs):
-    """Buffers up rows in memory that should be written."""
-    raise NotImplementedError
+    """Buffers rows in memory that should be written.
+
+    See _ConvertInputRow for rules on *args and **kwargs.
+
+    Args:
+      args: The row to write, as positional arguments.
+      kwargs: The row to write, as keyword arguments.
+
+    Raises:
+      ValueError: If the inputs are invalid, or if both args/kwargs are
+        specified.
+    """
+    new_row = self._ConvertInputRow(*args, **kwargs)
+    self._BufferRow(new_row)
 
   def WriteBufferedRows(self):
-    """Writes all buffered up rows to storage."""
-    raise NotImplementedError
+    """Writes all buffered up rows to storage.
+
+    Raises:
+      Error: if the write failed.
+    """
+    self._WriteBuffer()
+
+  def ResetWriteBuffer(self):
+    """Resets the buffer of rows to write."""
+    self._buffer = []
+
+  def NumBufferedRows(self):
+    """Returns number of buffered rows."""
+    return len(self._buffer)
+
+  def _ConvertInputRow(self, *args, **kwargs):
+    """Converts input row to a validated row dictionary.
+
+    If *args is specified, then they must be coincident with the column names.
+    If **kwargs is specified, they must match the column names.
+    Both *args and **kwargs cannot be specified.
+
+    Returns:
+      The row as a dictionary keyed by the column names.
+
+    Raises:
+      ValueError: If input row is invalid.
+    """
+    if args and kwargs:
+      raise ValueError("Only one of *args or **kwargs must be entered.")
+    if args:
+      if len(args) != len(self._columns):
+        raise ValueError(
+            "Number of *args does not match with columns: %s" % self._columns)
+      row = dict(zip(self._columns, args))
+    if kwargs:
+      if set(kwargs.keys()) != set(self._columns):
+        raise ValueError(
+            "Keys in **kwargs does match with columns: %s" % self._columns)
+      row = kwargs
+    return row
+
+  def _BufferRow(self, row):
+    """Add a row to the buffer. Assumes the row has been validated.
+
+    Args:
+      row: A dictionary keyed by columns for the row to write.
+    """
+    self._buffer.append(row)
 
   def __iter__(self):
-    return self
-
-  def next(self):
-    for row in self._ReadRows():
-      yield row
+    """Allows callers to iterate across rows."""
+    return StorageTableIterator(self)
 
   def _ReadRows(self):
-    """Inner generator."""
-    raise NotImplementedError
+    """Generator that returns one row at a time.
+
+    THIS METHOD MUST BE OVERRIDDEN BY SUBCLASSES.
+
+    Returns:
+      The next row, as a dict keyed by the column names.
+    """
+    raise NotImplementedError("_ReadRows must be overridden by subclasses.")
+
+  def _WriteBuffer(self):
+    """Writes the row buffer to storage.
+
+    THIS METHOD MUST BE OVERRIDDEN BY SUBCLASSES.
+
+    Raises:
+      Error: If the write failed.
+    """
+    raise NotImplementedError("_WriteBuffer must be overridden by subclasses.")
 
 
-class CsvStorage(Storage):
+class StorageTableIterator(StorageTable):
+  """Class that enables callers to iterate through rows in StorageTable."""
+
+  def __init__(self, table):
+    self._rowgenerator = table._ReadRows()
+
+  def next(self):
+    next_row = self._rowgenerator.next()
+    if not next_row:
+      raise StopIteration
+    return next_row
+
+
+class CsvTable(StorageTable):
   def __init__(self, csv_config):
     self._file_path = csv_config.rel_path
-    super(CsvStorage, self).__init__(
+    super(CsvTable, self).__init__(
         csv_config.rel_path, csv_config.columns)
     # TODO: Read the entire file into memory
 
-  def BufferRowForWrite(self, *args, **kwargs):
-    """Buffers up rows in memory that should be written."""
-    raise NotImplementedError
-
-  def WriteBufferedRows(self):
-    """Writes all buffered up rows to storage."""
+  def _WriteBuffer(self):
+    # TODO
     raise NotImplementedError
 
   def _ReadRows(self):
