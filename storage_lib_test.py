@@ -1,5 +1,7 @@
 """Tests for storage_lib."""
 
+import os
+import json
 import mock
 
 import storage_lib
@@ -110,6 +112,36 @@ class StorageTableTest(basetest.TestCase):
 
 class CsvTableTest(basetest.TestCase):
   """Tests CsvTable subclass."""
+
+  _table_name = "test_table"
+  _csv_file_name = "csv_test_table.csv"
+  _columns = ["some", "test", "columns"]
+
+  def _WriteStorageConfigFile(self):
+    """Writes a storage config file pertinent to this test.
+
+    The config file can be used to instantiate a CsvTable class with the proper
+    parameters.
+    """
+    config_file_path = os.path.join(
+        FLAGS.test_tmpdir, "test_storage_config.json")
+    config = {
+        self._table_name: {
+          "rel_path": self._csv_file_name, "columns": self._columns}}
+    with open(config_file_path, "w") as f:
+      json.dump(config, f)
+    return config_file_path
+
+  def setUp(self):
+    FLAGS.storage_type = "csv"
+    FLAGS.csv_base_path = FLAGS.test_tmpdir
+    config_file_path = self._WriteStorageConfigFile()
+    FLAGS.storage_config_file = config_file_path
+    self.addCleanup(os.remove, config_file_path)
+    self._csv_table = storage_lib.GetStorageTable(self._table_name)
+
+  def testSomething(self):
+    pass
 
 
 if __name__ == "__main__":

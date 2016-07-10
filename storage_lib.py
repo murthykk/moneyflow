@@ -270,11 +270,14 @@ class CsvTable(StorageTable):
     os.remove(tmp_path)
 
   def _ReadCsvFile(self):
-    """Reeads CSV file into memory.
+    """Reads CSV file into memory.
 
     Returns:
-      CSV file rows, keyed by column titles.
+      A list of CSV file rows, keyed by column titles. If the file does not
+        exist, an empty list is returned.
     """
+    if not os.path.isfile(self._file_path):
+      return []
     with open(self._file_path, "r") as f:
       reader = csv.DictReader(f, fieldnames=self._columns)
       return list(reader)
