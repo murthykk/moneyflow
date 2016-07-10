@@ -1,7 +1,12 @@
-"""Set of classes tha handle data storage."""
+"""Set of classes tha handle data storage.
 
+Note: none of the classes below are thread-safe.
+"""
+
+import os
 import json
 import gflags as flags
+import shutil
 
 
 STORAGE_TYPES = ["csv"]
@@ -13,7 +18,8 @@ flags.DEFINE_string(
     "storage_config_file", "storage_config.json",
     "Base directory where all CSVs will be stored.")
 flags.DEFINE_string(
-    "csv_base_dir", "csvdata", "Base directory where all CSVs will be stored.")
+    "csv_base_path", "csvdata",
+    "Path to base directory where all CSVs will be stored.")
 
 
 FLAGS = flags.FLAGS
@@ -44,7 +50,15 @@ class StorageConfig(object):
 
 
 class StorageTable(object):
-  """Class to interface with a storage table."""
+  """Class to interface with a storage table.
+
+  This base class hides the implementation of the storage internals. It allows
+  users to store tables in different formats depending on the subclass.
+
+  Subclasses must override the following methods:
+    _ReadRows
+    _WriteBuffer
+  """
 
   def __init__(self, table_name, columns):
     """Constructor.
@@ -164,6 +178,22 @@ class StorageTable(object):
     """Allows callers to iterate across rows."""
     return StorageTableIterator(self)
 
+  def _ValidateBuffer(self):
+    """Validates that rows in the write buffer is consistent wtih the columns.
+
+    Raises:
+      Error: If the rows in the buffer have columns that are inconsistent with
+        this object.
+    """
+    for row in self._buffer:
+      if len(self._columns) != len(row.keys()):
+        raise Error("Number of cols does not match buffer. Cols: %r, Buffer: %r"
+                    % (self._columns, row.keys()))
+      for curr_col,buff_cal in zip(self._columns, row.keys()):
+        if curr_col != buff_col:
+          raise Error("Columns do not match buffer. Cols: %r, Buffer: %r"
+                      % (self._columns, row.keys()))
+
   def _ReadRows(self):
     """Generator that returns one row at a time.
 
@@ -175,7 +205,7 @@ class StorageTable(object):
     raise NotImplementedError("_ReadRows must be overridden by subclasses.")
 
   def _WriteBuffer(self):
-    """Writes the row buffer to storage.
+    """Writes the row buffer to storage, and clears the buffer.
 
     THIS METHOD MUST BE OVERRIDDEN BY SUBCLASSES.
 
@@ -199,15 +229,52 @@ class StorageTableIterator(StorageTable):
 
 
 class CsvTable(StorageTable):
+  """Subclass that stores rows in a CSV file."""
+
   def __init__(self, csv_config):
-    self._file_path = csv_config.rel_path
+    self._file_path = os.path.join(FLAGS.csv_base_path, csv_config.rel_path)
     super(CsvTable, self).__init__(
         csv_config.rel_path, csv_config.columns)
-    # TODO: Read the entire file into memory
-
-  def _WriteBuffer(self):
-    # TODO
-    raise NotImplementedError
+    self._rows = self._ReadCsvFile()
 
   def _ReadRows(self):
-    """Generator that returns rows from the CSV."""
+    """Generator that returns one row at a time.
+
+    This method overrides the base class method.
+
+    Returns:
+      The next row, as a dict keyed by the column names.
+    """
+    for row in self._rows:
+      yield row
+
+  def _WriteBuffer(self):
+    """Writes the row buffer to storage, and clears the buffer.
+
+    This method overrides the base class method.
+
+    Raises:
+      Error: If the write failed.
+    """
+    if len(self._buffer) == 0:
+      return
+    self._ValidateBuffer()
+    self._rows += self._buffer
+    tmp_path = "{}.tmp".format(self._file_path)
+    with open(self._file_path, "w") as f:
+      writer = csv.DictWriter(f, fieldnames=self._columns)
+      writer.writeheader()
+      for row in self._rows:
+        writer.writerow(row)
+    os.rename(tmp_path, self._file_path)
+    os.remove(tmp_path)
+
+  def _ReadCsvFile(self):
+    """Reeads CSV file into memory.
+
+    Returns:
+      CSV file rows, keyed by column titles.
+    """
+    with open(self._file_path, "r") as f:
+      reader = csv.DictReader(f, fieldnames=self._columns)
+      return list(reader)

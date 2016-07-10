@@ -29,8 +29,8 @@ class FakeStorageTable(storage_lib.StorageTable):
     self._buffer = []
 
 
-class StorageTest(basetest.TestCase):
-  """Tests Storage base class."""
+class StorageTableTest(basetest.TestCase):
+  """Tests StorageTable base class."""
 
   def setUp(self):
     self._fake_rows=[{"column1": "data", "column2": "atad"},
@@ -106,6 +106,10 @@ class StorageTest(basetest.TestCase):
     # Use the iterator to convert storage table to a list.
     iter_rows = [r for r in self._table]
     self.assertSameElements(self._fake_rows, iter_rows)
+
+
+class CsvTableTest(basetest.TestCase):
+  """Tests CsvTable subclass."""
 
 
 if __name__ == "__main__":
