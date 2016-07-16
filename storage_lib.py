@@ -26,15 +26,15 @@ flags.DEFINE_string(
 FLAGS = flags.FLAGS
 
 
+class Error(Exception):
+  """Exception type for this module."""
+
+
 def GetStorageTable(table_name):
   """Returns a storage interface object, given a storage config object."""
   config = StorageConfig.fromconfigfile(FLAGS.storage_config_file, table_name)
   if FLAGS.storage_type == "csv":
     return CsvTable(config)
-
-
-class Error(Exception):
-  """Exception type for this module."""
 
 
 class StorageConfig(object):
@@ -281,4 +281,6 @@ class CsvTable(StorageTable):
       return []
     with open(self.file_path, "r") as f:
       reader = csv.DictReader(f, fieldnames=self._columns)
+      # Skip header
+      reader.next()
       return list(reader)

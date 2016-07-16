@@ -4,6 +4,7 @@ import os
 import csv
 import json
 import mock
+import uuid
 
 import storage_lib
 import gflags as flags
@@ -141,13 +142,13 @@ class CsvTableTest(basetest.TestCase):
     parameters.
     """
     config_file_path = os.path.join(
-        FLAGS.test_tmpdir, "test_storage_config.json")
+        FLAGS.test_tmpdir, "config_{}.json".format(uuid.uuid1()))
     config = {
         self._table_name: {
-          "rel_path": self._csv_file_name, "columns": self._columns}}
+          "rel_path": rel_path, "columns": self._columns}}
     with open(config_file_path, "w") as f:
       json.dump(config, f)
-    self.addCleanup(os.remove, config_file_path)
+      self.addCleanup(os.remove, config_file_path)
     return config_file_path
 
   def testWrite(self):
@@ -169,7 +170,17 @@ class CsvTableTest(basetest.TestCase):
         self.assertEqual(data2[idx], row2[col])
 
   def testRead(self):
-    pass
+    table = self._GetCsvTable("testdata/test_read.csv")
+    exp_row1 = ["132", "12312", "12048"]
+    exp_row2 = ["data", "to", "read"]
+    with open(table.file_path, "r") as f:
+      reader = csv.DictReader(f)
+      row1 = reader.next()
+      row2 = reader.next()
+      for idx,exp in enumerate(exp_row1):
+        self.assertEqual(exp, row1[self._columns[idx]])
+      for idx,exp in enumerate(exp_row2):
+        self.assertEqual(exp, row2[self._columns[idx]])
 
 
 if __name__ == "__main__":
