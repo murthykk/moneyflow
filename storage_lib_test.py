@@ -1,6 +1,7 @@
 """Tests for storage_lib."""
 
 import os
+import csv
 import json
 import mock
 
@@ -114,10 +115,26 @@ class CsvTableTest(basetest.TestCase):
   """Tests CsvTable subclass."""
 
   _table_name = "test_table"
-  _csv_file_name = "csv_test_table.csv"
+  _csv_file_name = "test_table.csv"
   _columns = ["some", "test", "columns"]
 
-  def _WriteStorageConfigFile(self):
+  def setUp(self):
+    self._csv_table = self._GetCsvTable()
+
+  def _GetCsvTable(self, csv_file_path=None):
+    if csv_file_path is None:
+      FLAGS.csv_base_path = FLAGS.test_tmpdir
+      config_file_path = self._WriteStorageConfigFile(self._csv_file_name)
+    else:
+      FLAGS.csv_base_path = os.path.dirname(csv_file_path)
+      config_file_path = self._WriteStorageConfigFile(
+          os.path.basename(csv_file_path))
+
+    FLAGS.storage_type = "csv"
+    FLAGS.storage_config_file = config_file_path
+    return storage_lib.GetStorageTable(self._table_name)
+
+  def _WriteStorageConfigFile(self, rel_path):
     """Writes a storage config file pertinent to this test.
 
     The config file can be used to instantiate a CsvTable class with the proper
@@ -130,17 +147,28 @@ class CsvTableTest(basetest.TestCase):
           "rel_path": self._csv_file_name, "columns": self._columns}}
     with open(config_file_path, "w") as f:
       json.dump(config, f)
+    self.addCleanup(os.remove, config_file_path)
     return config_file_path
 
-  def setUp(self):
-    FLAGS.storage_type = "csv"
-    FLAGS.csv_base_path = FLAGS.test_tmpdir
-    config_file_path = self._WriteStorageConfigFile()
-    FLAGS.storage_config_file = config_file_path
-    self.addCleanup(os.remove, config_file_path)
-    self._csv_table = storage_lib.GetStorageTable(self._table_name)
+  def testWrite(self):
+    data1 = ("1", "2", "3")
+    data2 = ("a", "b", "c")
+    self._csv_table.BufferRowForWrite(*data1)
+    self._csv_table.BufferRowForWrite(*data2)
+    self._csv_table.WriteBufferedRows()
+    self.addCleanup(os.remove, self._csv_table.file_path)
 
-  def testSomething(self):
+    with open(self._csv_table.file_path, "r") as f:
+      reader = csv.DictReader(f)
+      self.assertSameElements(reader.fieldnames, self._columns)
+      row1 = reader.next()
+      row2 = reader.next()
+      for idx,col in enumerate(self._columns):
+        self.assertEqual(data1[idx], row1[col])
+      for idx,col in enumerate(self._columns):
+        self.assertEqual(data2[idx], row2[col])
+
+  def testRead(self):
     pass
 
 

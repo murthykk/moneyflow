@@ -4,6 +4,7 @@ Note: none of the classes below are thread-safe.
 """
 
 import os
+import csv
 import json
 import gflags as flags
 import shutil
@@ -189,10 +190,9 @@ class StorageTable(object):
       if len(self._columns) != len(row.keys()):
         raise Error("Number of cols does not match buffer. Cols: %r, Buffer: %r"
                     % (self._columns, row.keys()))
-      for curr_col,buff_cal in zip(self._columns, row.keys()):
-        if curr_col != buff_col:
-          raise Error("Columns do not match buffer. Cols: %r, Buffer: %r"
-                      % (self._columns, row.keys()))
+      if set(self._columns) != set(row.keys()):
+        raise Error("Columns do not match buffer. Cols: %r, Buffer: %r"
+            % (self._columns, row.keys()))
 
   def _ReadRows(self):
     """Generator that returns one row at a time.
@@ -231,8 +231,10 @@ class StorageTableIterator(StorageTable):
 class CsvTable(StorageTable):
   """Subclass that stores rows in a CSV file."""
 
+  file_path = ""
+
   def __init__(self, csv_config):
-    self._file_path = os.path.join(FLAGS.csv_base_path, csv_config.rel_path)
+    self.file_path = os.path.join(FLAGS.csv_base_path, csv_config.rel_path)
     super(CsvTable, self).__init__(
         csv_config.rel_path, csv_config.columns)
     self._rows = self._ReadCsvFile()
@@ -260,14 +262,13 @@ class CsvTable(StorageTable):
       return
     self._ValidateBuffer()
     self._rows += self._buffer
-    tmp_path = "{}.tmp".format(self._file_path)
-    with open(self._file_path, "w") as f:
+    tmp_path = "{}.tmp".format(self.file_path)
+    with open(tmp_path, "w") as f:
       writer = csv.DictWriter(f, fieldnames=self._columns)
       writer.writeheader()
       for row in self._rows:
         writer.writerow(row)
-    os.rename(tmp_path, self._file_path)
-    os.remove(tmp_path)
+    os.rename(tmp_path, self.file_path)
 
   def _ReadCsvFile(self):
     """Reads CSV file into memory.
@@ -276,8 +277,8 @@ class CsvTable(StorageTable):
       A list of CSV file rows, keyed by column titles. If the file does not
         exist, an empty list is returned.
     """
-    if not os.path.isfile(self._file_path):
+    if not os.path.isfile(self.file_path):
       return []
-    with open(self._file_path, "r") as f:
+    with open(self.file_path, "r") as f:
       reader = csv.DictReader(f, fieldnames=self._columns)
       return list(reader)
