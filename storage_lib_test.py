@@ -9,28 +9,10 @@ import uuid
 import storage_lib
 import gflags as flags
 from google.apputils import basetest
+import test_utils
 
 
 FLAGS = flags.FLAGS
-
-
-class FakeStorageTable(storage_lib.StorageTable):
-  """Fake storage class used for testing."""
-
-  _fake_rows = None
-
-  def __init__(self, table_name, columns, **kwargs):
-    super(FakeStorageTable, self).__init__(table_name, columns)
-    if "fake_rows" in kwargs.keys():
-      self._fake_rows = kwargs["fake_rows"]
-
-  def _ReadRows(self):
-    for row in self._fake_rows:
-      yield row
-
-  def _WriteBuffer(self):
-    self._fake_rows += self._buffer
-    self._buffer = []
 
 
 class StorageTableTest(basetest.TestCase):
@@ -41,7 +23,7 @@ class StorageTableTest(basetest.TestCase):
                      {"column1": "word", "column2": "drow"},
                      {"column1": "test", "column2": "tset"}]
     self._fake_columns = ["column1", "column2"]
-    self._table = FakeStorageTable(
+    self._table = test_utils.FakeStorageTable(
         "test", self._fake_columns, fake_rows=self._fake_rows)
 
   def testGetAllRows(self):
