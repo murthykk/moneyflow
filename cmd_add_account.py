@@ -1,35 +1,46 @@
 """Command execution harness for importing new data."""
 
 
+import re
+
 from google.apputils import appcommands
 import gflags as flags
 import accounts_lib
 import tabulate
+import ui_utils
 
 
 class CmdAddAccount(appcommands.Cmd):
-  """Import command."""
+  """Adds an account."""
 
   def Run(self, argv):
     accounts = accounts_lib.AccountList()
     print "Current accounts:"
-    self.PrintAccounts(accounts)
-    # TODO: Gather account info from user
-    input_account_name = "test"
-    input_account_number = "3242343"
-    # TODO: Add account to AccountList
-    acccounts.Add(
-        accounts_lib.Account(input_account_name, input_account_number))
+    accounts.Print()
+    acccounts.Add(self._GetAccountFromUser())
     print "New set of accounts:"
-    self.PrintAccounts(accounts)
-    # TODO: Prompt user for confirmation
-    accounts.Save()
-
-  def PrintAccounts(self, accounts):
-    """Print account information in a table. accounts is an AccountList."""
-    accounts_table = [a.tolist() for a in accounts.Accounts()]
-    if len(accounts_table) == 0:
-      print "No accounts found."
+    accounts.Print()
+    if ui_utils.PromptUser("Are you sure you want to save these accounts?"):
+      accounts.Save()
     else:
-      accounts_table = accounts.Accounts().getlistheadings() + accounts_table
-      tabulate.tabulate(accounts_table, headers="firstrow", tablefmt="psql")
+      print "Accounts not saved."
+
+  def _GetAccountFromUser(self):
+    """Returns an Account object based on data gathered from user.
+
+    Raises:
+      ValueError: If the account number is invalid.
+    """
+    name = self._GetAccountNameFromUser()
+    number = self._GetAccountFromUser()
+    # Validate that the number is a number (assumes no alphabet characters in
+    # the account number).
+    if re.match("^[0-9]*$", number) is None:
+      raise ValueError("Account number is invalid: %r" % number)
+    return accounts_lib.Account(input_account_name, input_account_number)
+
+  def _GetAccountNameFromUser(self):
+    return raw_input("Enter account name: ")
+
+  def _GetAccountNumberFromUser(self):
+    return raw_input("Enter account number: ")

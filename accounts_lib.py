@@ -29,6 +29,15 @@ class AccountList(object):
     for account in self._accounts:
       yield account
 
+  def Print(self):
+    """Print account information in a table."""
+    accounts_table = [a.tolist() for a in self.Accounts()]
+    if len(accounts_table) == 0:
+      print "No accounts found."
+    else:
+      accounts_table += self._accounts[0].getlistheadings()
+      tabulate.tabulate(accounts_table, headers="firstrow", tablefmt="psql")
+
 
 class Account(object):
   """Account base class."""
