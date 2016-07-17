@@ -13,6 +13,10 @@ class AccountList(object):
     self._storage = storage_lib.GetStorageTable("accounts")
     self._accounts = self.ReadAll()
 
+  def Add(self, account):
+    # TODO
+    pass
+
   def Save(self):
     """Saves account information to storage."""
     for account in self._accounts:

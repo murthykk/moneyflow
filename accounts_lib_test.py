@@ -22,11 +22,14 @@ class AccountsListTest(basetest.TestCase):
     self.addCleanup(mock.patch.stopall)
     self._accounts = accounts_lib.AccountList()
 
-  def testSomething(self):
+  def testAdd(self):
     pass
 
-class AccountTest(basetest.TestCase):
-  pass
+  def testSave(self):
+    pass
+
+  def testPrint(self):
+    pass
 
 
 if __name__ == "__main__":
