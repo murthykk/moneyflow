@@ -4,6 +4,7 @@ Note: none of the classes below are thread-safe.
 """
 
 import os
+from collections import deque
 import csv
 import json
 import gflags as flags
@@ -76,7 +77,7 @@ class StorageTable(object):
     if len(set(columns)) != len(columns):
       raise ValueError("Column names not unique.")
     self._columns = columns
-    self._buffer = []
+    self._buffer = deque()
 
   def WriteRow(self, *args, **kwargs):
     """Writes row to storage.
@@ -131,10 +132,11 @@ class StorageTable(object):
       Error: if the write failed.
     """
     self._WriteBuffer()
+    self.ResetWriteBuffer()
 
   def ResetWriteBuffer(self):
     """Resets the buffer of rows to write."""
-    self._buffer = []
+    self._buffer = deque()
 
   def NumBufferedRows(self):
     """Returns number of buffered rows."""
@@ -205,7 +207,7 @@ class StorageTable(object):
     raise NotImplementedError("_ReadRows must be overridden by subclasses.")
 
   def _WriteBuffer(self):
-    """Writes the row buffer to storage, and clears the buffer.
+    """Writes the row buffer to storage. Does NOT clear the write buffer.
 
     THIS METHOD MUST BE OVERRIDDEN BY SUBCLASSES.
 
