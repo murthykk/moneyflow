@@ -7,7 +7,7 @@ import storage_lib
 class FakeStorageTable(storage_lib.StorageTable):
   """Fake storage class used for testing."""
 
-  _fake_rows = None
+  _fake_rows = []
 
   def __init__(self, table_name, columns, **kwargs):
     super(FakeStorageTable, self).__init__(table_name, columns)

@@ -2,26 +2,31 @@
 
 
 import copy
+from collections import deque
 import storage_lib
+import tabulate
 
 
 class AccountList(object):
   """Stores a list of accounts."""
-  _accounts = []
+  _accounts = deque()
 
   def __init__(self):
     self._storage = storage_lib.GetStorageTable("accounts")
     self._accounts = self.ReadAll()
 
   def Add(self, account):
-    # TODO
-    pass
+    """Add a new account to the list."""
+    if not isinstance(account, Account):
+      raise ValueError("Parameter 'account' must be an Account object.")
+    account.is_new = True
+    self._accounts.append(account)
 
   def Save(self):
     """Saves account information to storage."""
     for account in self._accounts:
       if account.is_new:
-        self._storage.BufferRowForWrite(account.todict())
+        self._storage.BufferRowForWrite(**account.todict())
     self._storage.WriteBufferedRows()
 
   def ReadAll(self):
@@ -39,7 +44,8 @@ class AccountList(object):
     if len(accounts_table) == 0:
       print "No accounts found."
     else:
-      accounts_table += self._accounts[0].getlistheadings()
+      accounts_table += self._accounts[0].getlistheadings(
+          "Account Name", "Account Number")
       tabulate.tabulate(accounts_table, headers="firstrow", tablefmt="psql")
 
 
@@ -64,4 +70,7 @@ class Account(object):
 
   @classmethod
   def getlistheadings(cls, name_str, number_str):
-    return [name, number]
+    """Given strings for the account parameters, returns a list of those
+    strings in the same order as tolist().
+    """
+    return [name_str, number_str]
