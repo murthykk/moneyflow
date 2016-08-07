@@ -236,7 +236,8 @@ class CsvTable(StorageTable):
   file_path = ""
 
   def __init__(self, csv_config):
-    self.file_path = os.path.join(FLAGS.csv_base_path, csv_config.rel_path)
+    self.file_path = os.path.join(
+        os.path.expanduser(FLAGS.csv_base_path), csv_config.rel_path)
     super(CsvTable, self).__init__(
         csv_config.rel_path, csv_config.columns)
     self._rows = self._ReadCsvFile()

@@ -20,6 +20,7 @@ class AccountList(object):
     if not isinstance(account, Account):
       raise ValueError("Parameter 'account' must be an Account object.")
     account.is_new = True
+    print "adding account: %s" % account
     self._accounts.append(account)
 
   def Save(self):
@@ -44,9 +45,10 @@ class AccountList(object):
     if len(accounts_table) == 0:
       print "No accounts found."
     else:
-      accounts_table += self._accounts[0].getlistheadings(
-          "Account Name", "Account Number")
-      tabulate.tabulate(accounts_table, headers="firstrow", tablefmt="psql")
+      accounts_table = [self._accounts[0].getlistheadings(
+          "Account Name", "Account Number")] + accounts_table
+      print tabulate.tabulate(
+          accounts_table, headers="firstrow", tablefmt="psql")
 
 
 class Account(object):
@@ -74,3 +76,7 @@ class Account(object):
     strings in the same order as tolist().
     """
     return [name_str, number_str]
+
+  def __repr__(self):
+    return "name: %r, number: %r, new: %r" % (
+        self.name, self.number, self.is_new)

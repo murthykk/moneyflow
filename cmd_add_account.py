@@ -1,4 +1,4 @@
-"""Command execution harness for importing new data."""
+"""Command for adding a new account."""
 
 
 import re
@@ -17,7 +17,7 @@ class CmdAddAccount(appcommands.Cmd):
     accounts = accounts_lib.AccountList()
     print "Current accounts:"
     accounts.Print()
-    acccounts.Add(self._GetAccountFromUser())
+    accounts.Add(self._GetAccountFromUser())
     print "New set of accounts:"
     accounts.Print()
     if ui_utils.PromptUser("Are you sure you want to save these accounts?"):
@@ -32,12 +32,12 @@ class CmdAddAccount(appcommands.Cmd):
       ValueError: If the account number is invalid.
     """
     name = self._GetAccountNameFromUser()
-    number = self._GetAccountFromUser()
+    number = self._GetAccountNumberFromUser()
     # Validate that the number is a number (assumes no alphabet characters in
     # the account number).
     if re.match("^[0-9]*$", number) is None:
       raise ValueError("Account number is invalid: %r" % number)
-    return accounts_lib.Account(input_account_name, input_account_number)
+    return accounts_lib.Account(name, number)
 
   def _GetAccountNameFromUser(self):
     return raw_input("Enter account name: ")
