@@ -5,7 +5,7 @@
   },
   "transactions": {
     "rel_path": "transactions.csv",
-    "columns": ["account_name", "date", "transaction_name", "amount"]
+    "columns": ["account_number", "transaction_date", "transaction_description", "transaction_amount"]
   },
   "categories": {
     "rel_path": "categories.csv",

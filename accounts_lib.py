@@ -13,14 +13,13 @@ class AccountList(object):
 
   def __init__(self):
     self._storage = storage_lib.GetStorageTable("accounts")
-    self._accounts = self.ReadAll()
+    self._accounts = deque(self.ReadAll())
 
   def Add(self, account):
     """Add a new account to the list."""
     if not isinstance(account, Account):
       raise ValueError("Parameter 'account' must be an Account object.")
     account.is_new = True
-    print "adding account: %s" % account
     self._accounts.append(account)
 
   def Save(self):
@@ -32,7 +31,7 @@ class AccountList(object):
 
   def ReadAll(self):
     """Reads account information from storage."""
-    return [Account.fromdict(row) for row in self._storage.GetAllRows()]
+    return deque(Account.fromdict(row) for row in self._storage.GetAllRows())
 
   def Accounts(self):
     """Generator that returns account information."""
@@ -41,7 +40,7 @@ class AccountList(object):
 
   def Print(self):
     """Print account information in a table."""
-    accounts_table = [a.tolist() for a in self.Accounts()]
+    accounts_table = [a.tolist() for a in self._accounts]
     if len(accounts_table) == 0:
       print "No accounts found."
     else:
