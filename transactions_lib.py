@@ -38,6 +38,7 @@ class Transaction(object):
     self.date = date
     self.description = description
     self.amount = amount
+    self.is_new = False
 
   def todict(self):
     return {

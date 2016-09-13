@@ -7,6 +7,7 @@ import storage_lib
 import tabulate
 
 
+# TODO: Refactor to use storage_lib.ObjectStorage
 class AccountList(object):
   """Stores a list of accounts."""
   _accounts = deque()
