@@ -21,7 +21,8 @@ def main(argv):
   # Print all accounts.
   appcommands.AddCmd("list_accounts", cmd_print_accounts.CmdPrintAccounts)
   # Import transaction data into an account.
-  appcommands.AddCmd("import", cmd_import_transactions.CmdImportTransactions)
+  appcommands.AddCmd(
+      "import_transactions", cmd_import_transactions.CmdImportTransactions)
   # Print transaction daata.
   #appcommands.AddCmd("print_transactions", CmdPrintTransactions)
   # Categorize transaction data.
