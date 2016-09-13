@@ -11,7 +11,7 @@ import ui_utils
 
 
 class CmdPrintAccounts(appcommands.Cmd):
-  """Appcommands harness to print a list of all accounts."""
+  """Prints a list of all accounts."""
 
   def Run(self, argv):
     accounts = accounts_lib.AccountList()

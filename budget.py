@@ -9,6 +9,7 @@ import argparse
 from google.apputils import appcommands
 import cmd_add_account
 import cmd_print_accounts
+import cmd_import_transactions
 import gflags as flags
 
 
@@ -20,9 +21,9 @@ def main(argv):
   # Print all accounts.
   appcommands.AddCmd("list_accounts", cmd_print_accounts.CmdPrintAccounts)
   # Import transaction data into an account.
-  #appcommands.AddCmd("import", CmdImportTransactions)
+  appcommands.AddCmd("import", cmd_import_transactions.CmdImportTransactions)
   # Print transaction daata.
-  #appcommands.AddCmd("import", CmdPrintTransactions)
+  #appcommands.AddCmd("print_transactions", CmdPrintTransactions)
   # Categorize transaction data.
   #appcommands.AddCmd("categorize", CmdCategorize)
 
