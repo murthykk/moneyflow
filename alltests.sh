@@ -7,3 +7,6 @@ python accounts_lib_test.py
 
 echo "transactions_lib_test.py"
 python transactions_lib_test.py
+
+echo "categories_lib_test.py"
+python categories_lib_test.py
