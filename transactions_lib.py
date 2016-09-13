@@ -3,56 +3,17 @@
 import datetime
 from collections import deque
 import storage_lib
-import tabulate
 
 
 TRANSACTION_DATE_FORMAT = "%Y-%m-%d"
 
 
-class TransactionsTable(object):
-  """Accesses a table of transaction info."""
-
-  _transactions = deque()
+class TransactionsTable(storage_lib.ObjectStorage):
 
   def __init__(self):
-    self._storage = storage_lib.GetStorageTable("transactions")
-    self._transactions = deque()
-
-  def Add(self, transaction):
-    if not isinstance(transaction, Transaction):
-      raise ValueError("Argument 'transaction' must be a Transaction object.")
-    transaction.is_new = True
-    self._transactions.append(transaction)
-
-  def Save(self):
-    """Saves transaction information to storage."""
-    for transaction in self._transactions:
-      if transaction.is_new:
-        self._storage.BufferRowForWrite(**transaction.todict())
-    self._storage.WriteBufferedRows()
-
-  def ReadAll(self):
-    """Reads all transaction info from storage."""
-    return deque(
-        Transaction.fromdict(row) for row in self._storage.GetAllRows())
-
-  def Print(self, transactions=None):
-    """Print transaction information in a table."""
-    if transactions is None:
-      transactions = self.ReadAll()
-      transactions.extend(self._transactions)
-    if not isinstance(transactions, deque):
-      ValueError("Argument 'transactions' must be a deque of Transaction objs.")
-    table = [a.tolist() for a in transactions]
-    if len(table) == 0:
-      print "No transactions found."
-    else:
-      table = [
-          Transaction.getlistheadings(
-              "Account Number", "Date", "Description", "Amount")
-          ] + table
-      print tabulate.tabulate(
-          table, headers="firstrow", tablefmt="psql")
+    super(TransactionsTable, self).__init__(
+        "transactions", Transaction,
+        ["Account Number", "Date", "Description", "Amount"])
 
 
 class Transaction(object):

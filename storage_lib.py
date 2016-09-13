@@ -9,6 +9,7 @@ import csv
 import json
 import gflags as flags
 import shutil
+import tabulate
 
 
 STORAGE_TYPES = ["csv"]
@@ -36,6 +37,56 @@ def GetStorageTable(table_name):
   config = StorageConfig.fromconfigfile(FLAGS.storage_config_file, table_name)
   if FLAGS.storage_type == "csv":
     return CsvTable(config)
+
+
+class ObjectStorage(object):
+  """Accesses deserialized objects from a storage backend.
+
+  The object class must be passed in to obj_cls, and it must implement:
+    todict
+    fromdict
+    tolist
+    getlistheadings
+  """
+
+  _objects = deque()
+
+  def __init__(self, table_name, obj_cls, table_headings):
+    self._storage = GetStorageTable(table_name)
+    self._objects = deque()
+    self._obj_cls = obj_cls
+    self._table_headings = table_headings
+
+  def Add(self, obj):
+    if not isinstance(obj, self._obj_cls):
+      raise ValueError("Must add a %s object." % self._obj_cls.__name__)
+    obj.is_new = True
+    self._objects.append(obj)
+
+  def Save(self):
+    """Saves object information to storage."""
+    for obj in self._objects:
+      if obj.is_new:
+        self._storage.BufferRowForWrite(**obj.todict())
+    self._storage.WriteBufferedRows()
+
+  def ReadAll(self):
+    """Reads all object info from storage."""
+    return deque(
+        self._obj_cls.fromdict(row) for row in self._storage.GetAllRows())
+
+  def Print(self):
+    """Print object information in a table."""
+    objects = self.ReadAll()
+    objects.extend(self._objects)
+    table = [a.tolist() for a in objects]
+    if len(table) == 0:
+      print "No object found."
+    else:
+      table = [
+          self._obj_cls.getlistheadings(*self._table_headings)] + table
+      print tabulate.tabulate(
+          table, headers="firstrow", tablefmt="psql")
 
 
 class StorageConfig(object):
