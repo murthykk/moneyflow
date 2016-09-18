@@ -46,6 +46,24 @@ class TransactionsTableTest(basetest.TestCase):
     self.assertEqual(test_description, row["transaction_description"])
     self.assertEqual(test_amount, float(row["transaction_amount"]))
 
+  def testGetSetOfAllTransactions(self):
+    test_account_num = 312098
+    test_date = datetime.date(2007, 3, 13)
+    test_description = "This is an hashed transaction."
+    test_amount = -41.23
+    txn = transactions_lib.Transaction(
+        test_account_num, test_date, test_description, test_amount)
+    self._transactions.Add(txn)
+    self._transactions.Save()
+
+    txn_set = self._transactions.GetSetOfAllTransactions()
+    self.assertEqual(1, len(txn_set))
+
+    txn2 = transactions_lib.Transaction(
+        test_account_num, test_date, test_description, test_amount)
+    self.assertTrue(txn2 in txn_set)
+
+
   def testPrint(self):
     test_account_num = 3243
     test_date = datetime.date(2009, 7, 21)

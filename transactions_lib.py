@@ -21,7 +21,7 @@ class TransactionsTable(storage_lib.ObjectStorage):
         "transactions", Transaction,
         ["Account Number", "Date", "Description", "Amount"])
 
-  def GetSetOfAllTransactions():
+  def GetSetOfAllTransactions(self):
     """Returns a set containing all transaction objects.
 
     Raises an error if duplicate transactions exist in the system.
@@ -110,8 +110,8 @@ class Transaction(object):
   @classmethod
   def fromdict(cls, row):
     return cls(
-        int(row["account_num"]),
-        datetime.strptime(
+        int(row["account_number"]),
+        datetime.datetime.strptime(
           row["transaction_date"], TRANSACTION_DATE_FORMAT).date(),
         row["transaction_description"], float(row["transaction_amount"]))
 
