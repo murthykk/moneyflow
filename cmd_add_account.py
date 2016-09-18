@@ -14,7 +14,7 @@ class CmdAddAccount(appcommands.Cmd):
   """Adds an account."""
 
   def Run(self, argv):
-    accounts = accounts_lib.AccountList()
+    accounts = accounts_lib.AccountsTable()
     print "Current accounts:"
     accounts.Print()
     accounts.Add(self._GetAccountFromUser())

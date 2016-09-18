@@ -14,5 +14,5 @@ class CmdPrintAccounts(appcommands.Cmd):
   """Prints a list of all accounts."""
 
   def Run(self, argv):
-    accounts = accounts_lib.AccountList()
+    accounts = accounts_lib.AccountsTable()
     accounts.Print()

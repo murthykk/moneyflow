@@ -25,7 +25,7 @@ class CmdImportTransactions(appcommands.Cmd):
 
   def Run(self, argv):
     # Load account info.
-    accounts = accounts_lib.AccountList()
+    accounts = accounts_lib.AccountsTable()
 
     # Prompt user to select account
     print "Please select an account from the following list:"
