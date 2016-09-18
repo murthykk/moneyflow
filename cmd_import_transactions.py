@@ -51,11 +51,11 @@ class CmdImportTransactions(appcommands.Cmd):
 
   def _CheckIfNewTransactionIsValid(transaction):
     """Checks if a new transaction is valid. Returns True or False."""
-    if txn.account_num not in account_nums:
+    if txn.account_num not in self._account_nums:
       print "ERROR: Unknown account number {} for transaction {}.".format(
           txn.account_number, txn)
       return False
-    if txn in all_transactions:
+    if txn in self._all_transactions:
       print "ERROR: Transaction alraedy exists: {}.".format(txn)
       return False
     return True

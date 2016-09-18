@@ -83,7 +83,7 @@ class Transaction(object):
   def __eq__(self, other):
     """Transactions are duplicate if all fields are the same."""
     return (
-        self.accont_num == other.account_num
+        self.account_num == other.account_num
         and self.date == other.date
         and self.description == other.description
         and self.amount == other.amount)
@@ -91,7 +91,7 @@ class Transaction(object):
   def __hash__(self):
     """Hash all fields."""
     return hash(
-        "{}_{}_{}_{0:.2f}".format(
+        "{}_{}_{}_{:.2f}".format(
             self.account_num,
             self.date.strftime(TRANSACTION_DATE_FORMAT),
             self.description,
@@ -132,14 +132,14 @@ def ImportTransactions(ofx_file):
   # Parse the OFX file.
   with open(ofx_file, "r") as f:
     ofx = ofxparse.OfxParser.parse(f)
-  acount_number = ofx.accounts.number
+  account_number = ofx.account.number
 
   # Convert the parsed file to Transaction objects
   transactions = deque()
-  for ofx_txn in ofx.statement.transactions:
+  for ofx_txn in ofx.account.statement.transactions:
     transactions.append(
         Transaction(int(account_number),
-                    ofx_txn.date,
+                    ofx_txn.date.date(),
                     ofx_txn.payee.upper(),
                     float(ofx_txn.amount)))
 

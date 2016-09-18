@@ -1,5 +1,6 @@
 """Tests for transactions_lib."""
 
+import os
 import datetime
 import mock
 
@@ -54,6 +55,36 @@ class TransactionsTableTest(basetest.TestCase):
         transactions_lib.Transaction(
           test_account_num, test_date, test_description, test_amount))
     self._transactions.Print()
+
+  def testEq(self):
+    txn1 = transactions_lib.Transaction(
+        1234, datetime.date(1999, 9, 19), "testeq", 12321.09)
+    txn2 = transactions_lib.Transaction(
+        1234, datetime.date(1999, 9, 19), "testeq", 12321.09)
+    self.assertTrue(txn1 == txn2)
+
+  def testHash(self):
+    txn1 = transactions_lib.Transaction(
+        41389, datetime.date(2007, 10, 9), "testhash", 328.21)
+    txn2 = transactions_lib.Transaction(
+        41389, datetime.date(2007, 10, 9), "testhash", 328.21)
+    s = set([txn1])
+    self.assertTrue(txn2 in s)
+
+
+class ImportTransactionsTest(basetest.TestCase):
+
+  def testImport(self):
+    file_path = os.path.join(
+        os.path.dirname(__file__), "testdata/test_import.ofx")
+    transactions = transactions_lib.ImportTransactions(file_path)
+    self.assertEqual(1, len(transactions))
+    t = transactions[0]
+    self.assertEqual(1234567, t.account_num)
+    self.assertEqual(datetime.date(2016, 9, 15), t.date)
+    self.assertEqual("NEW YORK TIMES DIGITAL", t.description)
+    self.assertEqual(-15.0, t.amount)
+
 
 
 if __name__ == "__main__":
