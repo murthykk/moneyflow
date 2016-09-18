@@ -20,7 +20,7 @@ class AccountsListTest(basetest.TestCase):
         accounts_lib.storage_lib, "GetStorageTable",
         return_value=self._fake_storage).start()
     self.addCleanup(mock.patch.stopall)
-    self._accounts = accounts_lib.AccountList()
+    self._accounts = accounts_lib.AccountsTable()
 
   def testAdd(self):
     test_account_name = "test_add"

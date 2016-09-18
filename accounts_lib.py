@@ -7,11 +7,11 @@ import storage_lib
 import tabulate
 
 
-class AccountList(storage_lib.ObjectStorage):
+class AccountsTable(storage_lib.ObjectStorage):
   """Accesses a table of account information."""
 
   def __init__(self):
-    super(AccountList, self).__init__(
+    super(AccountsTable, self).__init__(
         "accounts", Account, ["Account Name", "Account Number"])
 
   def Accounts(self):
