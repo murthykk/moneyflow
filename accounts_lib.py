@@ -33,19 +33,23 @@ class Account(object):
 
   def __init__(self, name, number):
     """Instantiate an account given the account parameters."""
+    if not isinstance(name, basestring):
+      raise ValueError("Argument 'name' must be a string.")
+    if not isinstance(number, int):
+      raise ValueError("Argument 'number' must be a int.")
     self.name = name
     self.number = number
     self.is_new = False
 
   def todict(self):
-    return {"account_name": self.name, "account_number": self.number}
+    return {"account_name": self.name, "account_number": str(self.number)}
 
   def tolist(self):
     return [self.name, self.number]
 
   @classmethod
   def fromdict(cls, row):
-    return cls(row["account_name"], row["account_number"])
+    return cls(row["account_name"], int(row["account_number"]))
 
   @classmethod
   def getlistheadings(cls, name_str, number_str):
