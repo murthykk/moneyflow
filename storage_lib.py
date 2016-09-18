@@ -39,7 +39,7 @@ def GetStorageTable(table_name):
     return CsvTable(config)
 
 
-# TODO: Unit test this class.
+# TODO: Unit test this class and remove subclass unit tests.
 class ObjectStorage(object):
   """Accesses deserialized objects from a storage backend.
 

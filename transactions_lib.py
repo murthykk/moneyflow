@@ -2,6 +2,7 @@
 
 import datetime
 from collections import deque
+import ofxparse
 import storage_lib
 
 
@@ -64,3 +65,33 @@ class Transaction(object):
         datetime.strptime(
           row["transaction_date"], TRANSACTION_DATE_FORMAT).date(),
         row["transaction_description"], float(row["transaction_amount"]))
+
+  def __repr__(self):
+    """Return string representation of this object."""
+    return str(self.todict())
+
+  def __str__(self):
+    return self.__repr__()
+
+
+def ImportTransactions(ofx_file):
+  """Import transatction data from an OFX file.
+
+  Returns:
+    A deque of transactions.
+  """
+  # Parse the OFX file.
+  with open(ofx_file, "r") as f:
+    ofx = ofxparse.OfxParser.parse(f)
+  acount_number = ofx.accounts.number
+
+  # Convert the parsed file to Transaction objects
+  transactions = deque()
+  for ofx_txn in ofx.statement.transactions:
+    transactions.append(
+        Transaction(int(account_number),
+                    ofx_txn.date,
+                    ofx_txn.payee.upper(),
+                    float(ofx_txn.amount)))
+
+  return transactions

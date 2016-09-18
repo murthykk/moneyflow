@@ -19,6 +19,14 @@ class AccountsTable(storage_lib.ObjectStorage):
     for account in self._objects:
       yield account
 
+  def GetSetOfAccountNums(self):
+    """Returns a set of all available account numbers."""
+    self.ReadAll()
+    account_nums = set()
+    for account in self._objects:
+      account_nums.add(account.number)
+    return account_nums
+
 
 class Account(object):
   """Account base class."""
