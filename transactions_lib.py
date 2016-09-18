@@ -9,6 +9,10 @@ import storage_lib
 TRANSACTION_DATE_FORMAT = "%Y-%m-%d"
 
 
+class Error(Exception):
+  """Exception class for this module."""
+
+
 class TransactionsTable(storage_lib.ObjectStorage):
   """Accesses a table of transaction information."""
 
@@ -17,9 +21,32 @@ class TransactionsTable(storage_lib.ObjectStorage):
         "transactions", Transaction,
         ["Account Number", "Date", "Description", "Amount"])
 
+  def GetSetOfAllTransactions():
+    """Returns a set containing all transaction objects.
+
+    Raises an error if duplicate transactions exist in the system.
+    """
+    self.ReadAll()
+    txn_set = set(self._objects)
+    if len(self._objects) != len(txn_set):
+      txn_set = set()
+      duplicates = deque()
+      for txn in self.objects:
+        if txn in txn_set:
+          duplicates.append(txn)
+        else:
+          txn_set.add(txn)
+      raise Error("Duplicate transactions exist: %r"
+                  % [str(t) for t in duplicates])
+    return txn_set
+
 
 class Transaction(object):
-  """Container for transaction data."""
+  """Container for transaction data.
+
+  Transaction objects can be hashed and tested for equivalence, in order to
+  search for duplicate transactions.
+  """
 
   account_num = 0
   date = None
@@ -52,6 +79,28 @@ class Transaction(object):
 
   def tolist(self):
     return [self.account_num, self.date, self.description, self.amount]
+
+  def __eq__(self, other):
+    """Transactions are duplicate if all fields are the same."""
+    return (
+        self.accont_num == other.account_num
+        and self.date == other.date
+        and self.description == other.description
+        and self.amount == other.amount)
+
+  def __hash__(self):
+    """Hash all fields."""
+    return hash(
+        "{}_{}_{}_{0:.2f}".format(
+            self.account_num,
+            self.date.strftime(TRANSACTION_DATE_FORMAT),
+            self.description,
+            self.amount))
+
+  def __repr__(self):
+    return "account: %r, date: %r, description: %r, amount: %r" % (
+        self.account_num, self.date.strftime(TRANSACTION_DATE_FORMAT),
+        self.description, self.amount)
 
   @classmethod
   def getlistheadings(
