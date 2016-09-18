@@ -9,6 +9,7 @@ TRANSACTION_DATE_FORMAT = "%Y-%m-%d"
 
 
 class TransactionsTable(storage_lib.ObjectStorage):
+  """Accesses a table of transaction information."""
 
   def __init__(self):
     super(TransactionsTable, self).__init__(

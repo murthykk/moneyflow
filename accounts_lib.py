@@ -7,48 +7,17 @@ import storage_lib
 import tabulate
 
 
-# TODO: Refactor to use storage_lib.ObjectStorage
-class AccountList(object):
-  """Stores a list of accounts."""
-  _accounts = deque()
+class AccountList(storage_lib.ObjectStorage):
+  """Accesses a table of account information."""
 
   def __init__(self):
-    self._storage = storage_lib.GetStorageTable("accounts")
-    self._accounts = deque(self.ReadAll())
-
-  def Add(self, account):
-    """Add a new account to the list."""
-    if not isinstance(account, Account):
-      raise ValueError("Parameter 'account' must be an Account object.")
-    account.is_new = True
-    self._accounts.append(account)
-
-  def Save(self):
-    """Saves account information to storage."""
-    for account in self._accounts:
-      if account.is_new:
-        self._storage.BufferRowForWrite(**account.todict())
-    self._storage.WriteBufferedRows()
-
-  def ReadAll(self):
-    """Reads account information from storage."""
-    return deque(Account.fromdict(row) for row in self._storage.GetAllRows())
+    super(AccountList, self).__init__(
+        "accounts", Account, ["Account Name", "Account Number"])
 
   def Accounts(self):
     """Generator that returns account information."""
-    for account in self._accounts:
+    for account in self._objects:
       yield account
-
-  def Print(self):
-    """Print account information in a table."""
-    accounts_table = [a.tolist() for a in self._accounts]
-    if len(accounts_table) == 0:
-      print "No accounts found."
-    else:
-      accounts_table = [self._accounts[0].getlistheadings(
-          "Account Name", "Account Number")] + accounts_table
-      print tabulate.tabulate(
-          accounts_table, headers="firstrow", tablefmt="psql")
 
 
 class Account(object):
