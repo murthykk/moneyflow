@@ -23,11 +23,11 @@ class CmdImportTransactions(appcommands.Cmd):
         flag_values=flag_values)
     flags.MarkFlagAsRequired("ofx_file_path", flag_values=flag_values)
     super(CmdImportTransactions, self).__init__(name, flag_values, **kwargs)
-    self._account_nums = accounts_lib.AccountsTable().GetSetOfAccountNums()
-    self._all_transactions = (transactions_lib
-        .TransactionsTable().GetSetOfAllTransactions())
 
   def Run(self, argv):
+    account_nums = accounts_lib.AccountsTable().GetSetOfAccountNums()
+    existing_transactions = (transactions_lib
+                             .TransactionsTable().GetSetOfAllTransactions())
     # Load transaction info.
     new_txns = transactions_lib.ImportTransactions(
         ofx_file=os.path.expanduser(FLAGS.ofx_file_path))
@@ -36,8 +36,9 @@ class CmdImportTransactions(appcommands.Cmd):
     transactions = transactions_lib.TransactionsTable()
     error = False
     for txn in new_txns:
-      if self._CheckIfNewTransactionIsValid(txn):
-        transactions.Add(txn)
+      if self._CheckIfNewTransactionIsValid(txn, account_nums):
+        if self._FilterTransaction(txn, existing_transactions):
+          transactions.Add(txn)
       else:
         error = True
     if error:
@@ -45,21 +46,27 @@ class CmdImportTransactions(appcommands.Cmd):
       return
 
     # Prompt user and save transactions.
-    print "The following new transactions will be saved:"
-    transactions.Print()
-    if ui_utils.PromptUser("Save these transactions?"):
-      transactions.Save()
-      print "Done."
+    if len(transactions) > 0:
+      print "The following new transactions will be saved:"
+      transactions.Print()
+      if ui_utils.PromptUser("Save these transactions?"):
+        transactions.Save()
+        print "Done."
+      else:
+        print "Transactions not saved."
     else:
-      print "Transactions not saved."
+      print "No new transactions found."
 
-  def _CheckIfNewTransactionIsValid(self, transaction):
+  def _CheckIfNewTransactionIsValid(self, transaction, account_nums):
     """Checks if a new transaction is valid. Returns True or False."""
-    if transaction.account_num not in self._account_nums:
+    if transaction.account_num not in account_nums:
       print "ERROR: Unknown account number for transaction {}.".format(
           transaction)
       return False
-    if transaction in self._all_transactions:
-      print "ERROR: Transaction alraedy exists: {}.".format(transaction)
+    return True
+
+  def _FilterTransaction(self, transaction, existing_transactions):
+    if transaction in existing_transactions:
+      print "Transaction alraedy exists: {}.".format(transaction)
       return False
     return True

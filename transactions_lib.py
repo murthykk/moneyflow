@@ -26,12 +26,12 @@ class TransactionsTable(storage_lib.ObjectStorage):
 
     Raises an error if duplicate transactions exist in the system.
     """
-    self.ReadAll()
-    txn_set = set(self._objects)
-    if len(self._objects) != len(txn_set):
+    txns = self.ReadAll()
+    txn_set = set(txns)
+    if len(txns) != len(txn_set):
       txn_set = set()
       duplicates = deque()
-      for txn in self.objects:
+      for txn in txns:
         if txn in txn_set:
           duplicates.append(txn)
         else:

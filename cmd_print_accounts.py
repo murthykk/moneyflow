@@ -15,4 +15,5 @@ class CmdPrintAccounts(appcommands.Cmd):
 
   def Run(self, argv):
     accounts = accounts_lib.AccountsTable()
+    accounts.ReadAll(overwrite=True)
     accounts.Print()

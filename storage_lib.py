@@ -71,16 +71,22 @@ class ObjectStorage(object):
         self._storage.BufferRowForWrite(**obj.todict())
     self._storage.WriteBufferedRows()
 
-  def ReadAll(self):
-    """Reads all object info from storage."""
-    return deque(
+  def ReadAll(self, overwrite=False):
+    """Reads all object info from storage and returns a deque of objects.
+
+    Args:
+        overwrite: (default to False) If true, overwrites the data in this
+          object with the data that is read.
+    """
+    objs = deque(
         self._obj_cls.fromdict(row) for row in self._storage.GetAllRows())
+    if overwrite:
+      self._objects = objs
+    return objs
 
   def Print(self):
-    """Print object information in a table."""
-    objects = self.ReadAll()
-    objects.extend(self._objects)
-    table = [a.tolist() for a in objects]
+    """Print information about objects."""
+    table = [a.tolist() for a in self._objects]
     if len(table) == 0:
       print "No object found."
     else:
@@ -88,6 +94,9 @@ class ObjectStorage(object):
           self._obj_cls.getlistheadings(*self._table_headings)] + table
       print tabulate.tabulate(
           table, headers="firstrow", tablefmt="psql")
+
+  def __len__(self):
+    return len(self._objects)
 
 
 class StorageConfig(object):

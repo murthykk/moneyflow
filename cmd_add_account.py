@@ -37,7 +37,7 @@ class CmdAddAccount(appcommands.Cmd):
     # the account number).
     if re.match("^[0-9]*$", number) is None:
       raise ValueError("Account number is invalid: %r" % number)
-    return accounts_lib.Account(name, number)
+    return accounts_lib.Account(name, int(number))
 
   def _GetAccountNameFromUser(self):
     return raw_input("Enter account name: ")
