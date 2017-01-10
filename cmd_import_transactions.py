@@ -6,6 +6,7 @@ import re
 from google.apputils import appcommands
 import gflags as flags
 import accounts_lib
+import categories_lib
 import transactions_lib
 import tabulate
 import ui_utils
@@ -52,6 +53,7 @@ class CmdImportTransactions(appcommands.Cmd):
       if ui_utils.PromptUser("Save these transactions?"):
         transactions.Save()
         print "Done."
+        categories_lib.CategorizeTransactions(transactions.objects)
       else:
         print "Transactions not saved."
     else:

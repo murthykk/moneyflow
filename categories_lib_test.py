@@ -1,5 +1,6 @@
 """Tests for categories_lib."""
 
+import datetime
 import mock
 
 import categories_lib
@@ -7,6 +8,7 @@ import categories_lib
 from google.apputils import basetest
 import gflags as flags
 import test_utils
+import transactions_lib
 
 
 FLAGS = flags.FLAGS
@@ -45,8 +47,36 @@ class CategoriesTableTest(basetest.TestCase):
     test_category = "Sweetness"
     self._categories.Add(
         categories_lib.Category(
-          test_description, test_display_name, test_category))
+            test_description, test_display_name, test_category))
     self._categories.Print()
+
+  def testGetCategoryForTransaction(self):
+    test_description = "This transaction should be found"
+    test_display_name = "KnownTransaction"
+    test_category = "Valid"
+    self._categories.Add(
+        categories_lib.Category(
+            test_description, test_display_name, test_category))
+    self._categories.InitializeCategoryLookup()
+
+    cat = self._categories.GetCategoryForTransaction(
+        transactions_lib.Transaction(
+            0, datetime.date(2008, 3, 4), test_description, 0.0))
+    self.assertEqual(test_category, cat.category)
+
+  def testGetCategoryForTransaction_NoCategory(self):
+    test_description = "This transaction will not be found"
+    test_display_name = "UnknownTransaction"
+    test_category = "Invalid"
+    self._categories.Add(
+        categories_lib.Category(
+            test_description, test_display_name, test_category))
+    self._categories.InitializeCategoryLookup()
+
+    cat = self._categories.GetCategoryForTransaction(
+        transactions_lib.Transaction(
+            0, datetime.date(2008, 3, 4), "Unknown description",0.0))
+    self.assertIsNone(cat)
 
 
 if __name__ == "__main__":

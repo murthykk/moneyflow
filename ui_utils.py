@@ -1,4 +1,9 @@
-"""Utiliiies that help interface with users."""
+"""Utilities that help interface with users."""
+
+
+from collections import deque
+import tabulate
+
 
 def PromptUser(msg):
   ans = raw_input("{} [Y/n]: ".format(msg))
@@ -6,3 +11,74 @@ def PromptUser(msg):
     return True
   else:
     return False
+
+
+def CategorizeTransactions(transactions):
+  """Check that all transactions have categories.
+
+  If there are uncategorized transactions, the user is offered the
+  opportunity to add category information.
+
+  Args:
+    transactions: An iterable of Transaction objects to categorize.
+  """
+  if len(transactions) == 0:
+    "No transactions to categorize."
+    return
+
+  # Read all categories.
+  cat_table = CategoriesTable()
+  cat_table.ReadAll(overwrite=True)
+  cat_table.InitializeCategoryLookup()
+
+  # For every transaction, check if a category exists.
+  categories = deque()
+  for txn in transactions:
+    categories.append(cat_table.GetCategoryForTransaction(txn))
+
+  # Print results
+  PrintTransactionCategories(zip(transactions, categories))
+
+  # Offer user chance to add categories.
+  if PromptUser("Add categories to transactions without categories?")
+    AddCategoriesToTransactions(cat_table, transactions)
+
+
+def PrintTransactionCategories(transactions_and_categories):
+  """Prints categories associated with each transaction.
+
+  Args:
+    transactions_and_categories: Iterable of Transaction object + Category
+        object tuples.
+  """
+  if len(transactions_and_categories) == 0:
+    return
+
+  def get_cols(t):
+    txn = t[0].todict()
+    if cat is not None:
+      cat = t[1].todict()
+      return [
+        txn["transaction_date"],
+        txn["transaction_description"],
+        txn["transaction_amount"],
+        cat["category"]
+      ]
+    else:
+      return [
+        txn["transaction_date"],
+        txn["transaction_description"],
+        txn["transaction_amount"],
+        "None"
+      ]
+
+  table = [
+            "Date",
+            "Description",
+            "Amount",
+            "Category"
+          ] + [
+            get_cols(t) for t in transactions_and_categories
+            ]
+
+  print tabulate.tabulate(table, headers="firstrow", tablefmt="psql")

@@ -77,6 +77,9 @@ class ObjectStorage(object):
     Args:
         overwrite: (default to False) If true, overwrites the data in this
           object with the data that is read.
+
+    Returns:
+        Deque of objects that were read.
     """
     objs = deque(
         self._obj_cls.fromdict(row) for row in self._storage.GetAllRows())
@@ -97,6 +100,10 @@ class ObjectStorage(object):
 
   def __len__(self):
     return len(self._objects)
+
+  @property
+  def objects(self):
+    return self._objects
 
 
 class StorageConfig(object):
