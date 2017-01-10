@@ -40,7 +40,7 @@ def CategorizeTransactions(transactions):
   PrintTransactionCategories(zip(transactions, categories))
 
   # Offer user chance to add categories.
-  if PromptUser("Add categories to transactions without categories?")
+  if PromptUser("Add categories to transactions without categories?"):
     AddCategoriesToTransactions(cat_table, transactions)
 
 
@@ -72,13 +72,26 @@ def PrintTransactionCategories(transactions_and_categories):
         "None"
       ]
 
-  table = [
-            "Date",
-            "Description",
-            "Amount",
-            "Category"
-          ] + [
-            get_cols(t) for t in transactions_and_categories
-            ]
+  table = ["Date", "Description", "Amount", "Category"] + [
+    get_cols(t) for t in transactions_and_categories
+  ]
 
   print tabulate.tabulate(table, headers="firstrow", tablefmt="psql")
+
+
+def AddCategoriesToTransactions(cat_table, transactions):
+  """Prompts user to add category objects for uncategorized transactions.
+
+  This function runs a loop that interacts with the user. In each iteration,
+  the user enters information for a new category against an uncategorized
+  transaction. The new category is added to the category table. It is then
+  used to attempt to categorize all remaining transactions. The loop exits
+  when no uncategorized transactions exist, or if the user quits.
+
+  Args:
+    cat_table: The CategoryTable containing all categories to start with.
+    transacitons: Iterable of Transaction objects to categorize.
+
+  Returns:
+    Updated CategoryTable.
+  """
