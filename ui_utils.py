@@ -57,41 +57,6 @@ def CategorizeTransactions(transactions):
   cat_table.Save()
 
 
-def PrintTransactionCategories(transactions_and_categories):
-  """Prints categories associated with each transaction.
-
-  Args:
-    transactions_and_categories: Iterable of Transaction object + Category
-        object tuples.
-  """
-  if len(transactions_and_categories) == 0:
-    return
-
-  def get_cols(t):
-    txn = t[0].todict()
-    if cat is not None:
-      cat = t[1].todict()
-      return [
-        txn["transaction_date"],
-        txn["transaction_description"],
-        txn["transaction_amount"],
-        cat["category"]
-      ]
-    else:
-      return [
-        txn["transaction_date"],
-        txn["transaction_description"],
-        txn["transaction_amount"],
-        "None"
-      ]
-
-  table = ["Index", "Date", "Description", "Amount", "Category"] + [
-    [idx + 1] + get_cols(t) for idx,t in enumerate(transactions_and_categories)
-  ]
-
-  print tabulate.tabulate(table, headers="firstrow", tablefmt="psql")
-
-
 def AddCategoriesToTransactions(cat_table, transactions):
   """Prompts user to add category objects for uncategorized transactions.
 
@@ -140,6 +105,41 @@ def AddCategoriesToTransactions(cat_table, transactions):
       break
 
   return cat_table
+
+
+def PrintTransactionCategories(transactions_and_categories):
+  """Prints categories associated with each transaction.
+
+  Args:
+    transactions_and_categories: Iterable of Transaction object + Category
+        object tuples.
+  """
+  if len(transactions_and_categories) == 0:
+    return
+
+  def get_cols(t):
+    txn = t[0].todict()
+    if cat is not None:
+      cat = t[1].todict()
+      return [
+        txn["transaction_date"],
+        txn["transaction_description"],
+        txn["transaction_amount"],
+        cat["category"]
+      ]
+    else:
+      return [
+        txn["transaction_date"],
+        txn["transaction_description"],
+        txn["transaction_amount"],
+        "None"
+      ]
+
+  table = ["Index", "Date", "Description", "Amount", "Category"] + [
+    [idx + 1] + get_cols(t) for idx,t in enumerate(transactions_and_categories)
+    ]
+
+  print tabulate.tabulate(table, headers="firstrow", tablefmt="psql")
 
 
 def GetCategoryFromUser(transaction_description):

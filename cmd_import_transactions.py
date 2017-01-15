@@ -53,6 +53,7 @@ class CmdImportTransactions(appcommands.Cmd):
       if ui_utils.PromptUser("Save these transactions?"):
         transactions.Save()
         print "Done."
+        print "Starting transaction categorization."
         ui_utils.CategorizeTransactions(transactions.objects)
       else:
         print "Transactions not saved."
