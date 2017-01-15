@@ -37,6 +37,7 @@ def CategorizeTransactions(transactions):
     categories.append(cat_table.GetCategoryForTransaction(txn))
 
   # Print results
+  print "Transactions and their initial categories:"
   PrintTransactionCategories(zip(transactions, categories))
 
   # Offer user chance to add categories.
