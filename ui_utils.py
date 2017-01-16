@@ -7,7 +7,7 @@ import tabulate
 
 
 def PromptUser(msg):
-  ans = raw_input("{} [Y/n]: ".format(msg))
+  ans = raw_input("{} [Y/n]: ".format(msg)).upper()
   if ans == "Y":
     return True
   else:
@@ -95,7 +95,7 @@ def AddCategoriesToTransactions(cat_table, transactions):
       except ValueError as e:
         print "Invalid input. Problem: %s" % str(e)
         continue
-      cat = GetCategoryFromUser(transactions[idx])
+      cat = GetCategoryFromUser(transactions[idx].description)
       print "New Category:"
       PrettyPrintCategory(cat)
       if PromptUser("Add this category?"):
