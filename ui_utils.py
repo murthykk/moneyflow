@@ -71,7 +71,8 @@ def AddCategoriesToTransactions(cat_table, transactions):
     transacitons: Iterable of Transaction objects to categorize.
 
   Returns:
-    Updated CategoryTable.
+    True if all transactions have categories. False if some transactions
+    remain uncategorized.
   """
   while True:
     # For every transaction, check if a category exists.
@@ -85,7 +86,7 @@ def AddCategoriesToTransactions(cat_table, transactions):
 
     if None not in set(categories):
       print "All transactions have categories - quitting categorization."
-      break
+      return True
 
     # Offer user chance to add categories.
     if PromptUser("Add a category?"):
@@ -102,9 +103,7 @@ def AddCategoriesToTransactions(cat_table, transactions):
         cat_table.Add(cat)
     else:
       print "Quitting transaction categorization."
-      break
-
-  return cat_table
+      return False
 
 
 def PrintTransactionCategories(transactions_and_categories):
@@ -118,8 +117,9 @@ def PrintTransactionCategories(transactions_and_categories):
     return
 
   def get_cols(t):
+    """Returns a list of strings from rows in a joined transaction/category."""
     txn = t[0].todict()
-    if cat is not None:
+    if t[1] is not None:
       cat = t[1].todict()
       return [
         txn["transaction_date"],
@@ -135,7 +135,7 @@ def PrintTransactionCategories(transactions_and_categories):
         "None"
       ]
 
-  table = ["Index", "Date", "Description", "Amount", "Category"] + [
+  table = [["Index", "Date", "Description", "Amount", "Category"]] + [
     [idx + 1] + get_cols(t) for idx,t in enumerate(transactions_and_categories)
     ]
 
@@ -157,5 +157,5 @@ def GetCategoryFromUser(transaction_description):
 def PrettyPrintCategory(category):
   """Pretty prints information in a Category object."""
   tmp = categories_lib.CategoriesTable()
-  tmp.Add(cat)
+  tmp.Add(category)
   tmp.Print()

@@ -34,7 +34,15 @@ class CategoriesTable(storage_lib.ObjectStorage):
     Returns:
       A single Category object associated with the transaction, or None if no
       category could be found.
+
+    Raises:
+      RuntimeException: if this function was called before
+      InitializeCategoryLookup
     """
+    if self._description_map is None:
+      raise RuntimeError(
+          "GetCategoryFromTransaction was called before "
+          "InitializeCategoryLookUp")
     if transaction.description in self._description_map:
       return self.objects[self._description_map[transaction.description]]
     else:

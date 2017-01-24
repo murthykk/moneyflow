@@ -10,3 +10,6 @@ python transactions_lib_test.py
 
 echo "categories_lib_test.py"
 python categories_lib_test.py
+
+echo "ui_utils_test.py"
+python ui_utils_test.py
