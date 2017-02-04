@@ -7,11 +7,15 @@ import tabulate
 
 
 def PromptUser(msg):
-  ans = raw_input("{} [Y/n]: ".format(msg)).upper()
-  if ans == "Y":
-    return True
-  else:
-    return False
+  while True:
+    ans = raw_input("{} [Y/n]: ".format(msg)).upper()
+    if ans == "Y":
+      return True
+    elif ans == "N":
+      return False
+    else:
+      print "Please enter a valid response (y or n)."
+      continue
 
 
 def GetIntegerFromUser(msg, lower, upper):
@@ -49,11 +53,11 @@ def CategorizeTransactions(transactions):
     "No transactions to categorize."
     return
 
-  cat_table = CategoriesTable()
+  cat_table = categories_lib.CategoriesTable()
   cat_table.ReadAll(overwrite=True)
 
-  cat_table = AddCategoriesToTransactions(cat_table, transactions)
-  print "Saving any newly added categories."
+  AddCategoriesToTransactions(cat_table, transactions)
+  print "Saving newly added categories."
   cat_table.Save()
 
 
@@ -78,11 +82,15 @@ def AddCategoriesToTransactions(cat_table, transactions):
     # For every transaction, check if a category exists.
     cat_table.InitializeCategoryLookup()
     categories = deque()
+    uncat_txns = deque()
     for txn in transactions:
-      categories.append(cat_table.GetCategoryForTransaction(txn))
+      cat = cat_table.GetCategoryForTransaction(txn)
+      if cat is None:
+        uncat_txns.append(txn)
+        categories.append(cat)
 
-    print "Transactions and their categories:"
-    PrintTransactionCategories(zip(transactions, categories))
+    print "Uncategorized transactions and their categories:"
+    PrintTransactionCategories(zip(uncat_txns, categories))
 
     if None not in set(categories):
       print "All transactions have categories - quitting categorization."
@@ -93,10 +101,14 @@ def AddCategoriesToTransactions(cat_table, transactions):
       try:
         idx = GetIntegerFromUser(
             "Select a transaction index", 1, len(transactions))
+        idx -= 1
+        cat = GetCategoryFromUser(uncat_txns[idx].description)
       except ValueError as e:
         print "Invalid input. Problem: %s" % str(e)
         continue
-      cat = GetCategoryFromUser(transactions[idx].description)
+      except IndexError:
+        print "Input out of range, please try again."
+        continue
       print "New Category:"
       PrettyPrintCategory(cat)
       if PromptUser("Add this category?"):

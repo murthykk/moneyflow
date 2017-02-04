@@ -87,7 +87,7 @@ class CategorizationTests(basetest.TestCase):
         ui_utils.AddCategoriesToTransactions(
             cat_table, self.STANDARD_TRANSACTIONS))
 
-  @mock.patch("ui_utils.GetIntegerFromUser", return_value=3)
+  @mock.patch("ui_utils.GetIntegerFromUser", return_value=1)
   @mock.patch("ui_utils.PromptUser", side_effect=[True, True, False])
   def testAddCategoriesToTransactions_AddOneCategory(self, unused1, unused2):
     """Tests that a category can be added."""

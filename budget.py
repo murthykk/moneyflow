@@ -8,6 +8,7 @@ import argparse
 
 from google.apputils import appcommands
 import cmd_add_account
+import cmd_categorize
 import cmd_print_accounts
 import cmd_import_transactions
 import gflags as flags
@@ -26,7 +27,7 @@ def main(argv):
   # Print transaction daata.
   #appcommands.AddCmd("print_transactions", CmdPrintTransactions)
   # Categorize transaction data.
-  #appcommands.AddCmd("categorize", CmdCategorize)
+  appcommands.AddCmd("categorize", cmd_categorize.CmdCategorize)
 
 
 if __name__ == "__main__":
