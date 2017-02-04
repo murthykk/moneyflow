@@ -1,4 +1,4 @@
-"""Command for categorizing transacdtions."""
+"""Command for categorizing transactions."""
 
 
 from google.apputils import appcommands

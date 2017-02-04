@@ -1,17 +1,12 @@
 """Main budget script. Controls CSV ingest and adding new vendors/categories."""
 
 
-import os
-import csv
-import shutil
-import argparse
-
 from google.apputils import appcommands
 import cmd_add_account
 import cmd_categorize
+import cmd_list_categories
 import cmd_print_accounts
 import cmd_import_transactions
-import gflags as flags
 
 
 def main(argv):
@@ -24,10 +19,12 @@ def main(argv):
   # Import transaction data into an account.
   appcommands.AddCmd(
       "import_transactions", cmd_import_transactions.CmdImportTransactions)
-  # Print transaction daata.
+  # Print transaction data.
   #appcommands.AddCmd("print_transactions", CmdPrintTransactions)
   # Categorize transaction data.
   appcommands.AddCmd("categorize", cmd_categorize.CmdCategorize)
+  # List categories.
+  appcommands.AddCmd("list_categories", cmd_list_categories.CmdListCategories)
 
 
 if __name__ == "__main__":

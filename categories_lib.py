@@ -12,6 +12,12 @@ class CategoriesTable(storage_lib.ObjectStorage):
         ["Transaction Description", "Display Name", "Category"])
     self._description_map = None
 
+  def GetSortedCategoryNames(self):
+    """Returns a sorted iterable of all categories that exist in the table."""
+    return sorted(list(set(
+        [cat.category for cat in self.objects]
+    )))
+
   def InitializeCategoryLookup(self):
     """Initializes the object to lookup categories.
 
