@@ -27,7 +27,7 @@ class AccountsListTest(basetest.TestCase):
     test_account_number = 34109
     self._accounts.Add(
         accounts_lib.Account(test_account_name, test_account_number))
-    added_account = self._accounts.Accounts().next()
+    added_account = self._accounts.objects[0]
     self.assertEqual(test_account_name, added_account.name)
     self.assertEqual(test_account_number, added_account.number)
 

@@ -14,11 +14,6 @@ class AccountsTable(storage_lib.ObjectStorage):
     super(AccountsTable, self).__init__(
         "accounts", Account, ["Account Name", "Account Number"])
 
-  def Accounts(self):
-    """Generator that returns account information."""
-    for account in self._objects:
-      yield account
-
   def GetSetOfAccountNums(self):
     """Returns a set of all available account numbers."""
     account_nums = set()

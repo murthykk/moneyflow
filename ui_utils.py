@@ -100,7 +100,7 @@ def AddCategoriesToTransactions(cat_table, transactions):
     if PromptUser("Add a category?"):
       try:
         idx = GetIntegerFromUser(
-            "Select a transaction index", 1, len(transactions))
+            "Select a transaction index", 1, len(uncat_txns))
         idx -= 1
         cat = GetCategoryFromUser(uncat_txns[idx].description)
       except ValueError as e:
