@@ -48,12 +48,12 @@ class CmdExportData(appcommands.Cmd):
     Returns:
       List representing columns of joined data, in string format.
     """
-    t = transaction.todict()
+    t = transaction.tostringdict()
     acct = accounts_table.GetAccountForTransaction(transaction)
     cat = categories_table.GetCategoryForTransaction(transaction)
 
     if acct is not None:
-      a = acct.todict()
+      a = acct.tostringdict()
       acct_cols = [
         a["account_name"]
       ]
@@ -61,7 +61,7 @@ class CmdExportData(appcommands.Cmd):
       acct_cols = [None]
 
     if cat is not None:
-      c = cat.todict()
+      c = cat.tostringdict()
       cat_cols = [
         c["category"],
         c["display_name"]
@@ -70,7 +70,6 @@ class CmdExportData(appcommands.Cmd):
       cat_cols = [None, None]
 
     return acct_cols + [
-      t["account_number"],
       t["transaction_date"],
       t["transaction_description"],
       t["transaction_amount"],
@@ -80,7 +79,6 @@ class CmdExportData(appcommands.Cmd):
     """Returns list of headers for columns returned by _JoinColumns."""
     return [
       "account_name",
-      "account_number",
       "transaction_date",
       "transaction_description",
       "transaction_amount",
