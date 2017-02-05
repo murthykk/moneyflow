@@ -40,6 +40,8 @@ def GetStorageTable(table_name):
 
 
 # TODO: Unit test this class and remove subclass unit tests.
+# TODO: Make an object base class and make it clear what subclasses need to
+# implement.
 class ObjectStorage(object):
   """Accesses deserialized objects from a storage backend.
 

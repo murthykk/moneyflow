@@ -21,6 +21,16 @@ class AccountsTable(storage_lib.ObjectStorage):
       account_nums.add(account.number)
     return account_nums
 
+  def GetAccountForTransaction(self, transaction):
+    """Returns the Account object associated with the transaction, or None."""
+    accounts_map = {
+      acct.number: idx for idx,acct in enumerate(self.objects)
+    }
+    if transaction.account_num in accounts_map:
+      return self.objects[accounts_map[transaction.account_num]]
+    else:
+      return None
+
 
 class Account(object):
   """Account base class."""

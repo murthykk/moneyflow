@@ -4,6 +4,7 @@
 from google.apputils import appcommands
 import cmd_add_account
 import cmd_categorize
+import cmd_export_data
 import cmd_list_categories
 import cmd_print_accounts
 import cmd_import_transactions
@@ -25,6 +26,8 @@ def main(argv):
   appcommands.AddCmd("categorize", cmd_categorize.CmdCategorize)
   # List categories.
   appcommands.AddCmd("list_categories", cmd_list_categories.CmdListCategories)
+  # Export joined data
+  appcommands.AddCmd("export_data", cmd_export_data.CmdExportData)
 
 
 if __name__ == "__main__":
