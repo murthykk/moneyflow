@@ -77,6 +77,14 @@ class Transaction(object):
         "transaction_amount": str(self.amount)
     }
 
+  def to_native_dict(self):
+    return {
+      "account_number": self.account_num,
+      "transaction_date": self.date,
+      "transaction_description": self.description,
+      "transaction_amount": self.amount
+    }
+
   def tolist(self):
     return [self.account_num, self.date, self.description, self.amount]
 

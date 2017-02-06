@@ -52,7 +52,7 @@ class CmdExportData(appcommands.Cmd):
     acct = accounts_table.GetAccountForTransaction(transaction)
     cat = categories_table.GetCategoryForTransaction(transaction)
 
-    if acct is not None:
+    if not acct:
       a = acct.tostringdict()
       acct_cols = [
         a["account_name"]
@@ -60,7 +60,7 @@ class CmdExportData(appcommands.Cmd):
     else:
       acct_cols = [None]
 
-    if cat is not None:
+    if not cat:
       c = cat.tostringdict()
       cat_cols = [
         c["category"],

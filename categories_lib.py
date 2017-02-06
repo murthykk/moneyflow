@@ -81,6 +81,9 @@ class Category(object):
         "category": self.category
     }
 
+  def to_native_dict(self):
+    return self.todict()
+
   @classmethod
   def fromdict(cls, row):
     return cls(

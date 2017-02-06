@@ -48,6 +48,9 @@ class Account(object):
   def todict(self):
     return {"account_name": self.name, "account_number": str(self.number)}
 
+  def to_native_dict(self):
+    return {"account_name": self.name, "account_number": self.number}
+
   def tolist(self):
     return [self.name, self.number]
 
