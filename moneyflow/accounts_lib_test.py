@@ -38,7 +38,7 @@ class AccountsListTest(basetest.TestCase):
   def testSave(self):
     # Add a new account and save it to storage.
     test_account_name = "test_save"
-    test_account_number = 014707
+    test_account_number = 14707
     account_obj = accounts_lib.Account(test_account_name, test_account_number)
     self._accounts.Add(account_obj)
     self._accounts.Save()
