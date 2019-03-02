@@ -2,7 +2,7 @@
 
 import os
 import datetime
-import mock
+from unittest import mock
 
 import transactions_lib
 
@@ -38,7 +38,7 @@ class TransactionsTableTest(basetest.TestCase):
     self._transactions.Add(txn)
     self._transactions.Save()
 
-    row = self._fake_storage._ReadRows().next()
+    row = next(self._fake_storage._ReadRows())
     self.assertEqual(test_account_num, int(row["account_number"]))
     self.assertEqual(
         test_date.strftime(transactions_lib.TRANSACTION_DATE_FORMAT),

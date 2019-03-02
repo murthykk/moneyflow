@@ -1,6 +1,6 @@
 """Tests for accounts_lib."""
 
-import mock
+from unittest import mock
 
 import accounts_lib
 from google.apputils import basetest
@@ -44,7 +44,7 @@ class AccountsListTest(basetest.TestCase):
     self._accounts.Save()
 
     # Read the account row from storage and validate it.
-    row = self._fake_storage._ReadRows().next()
+    row = next(self._fake_storage._ReadRows())
     self.assertEqual(test_account_name, row["account_name"])
     self.assertEqual(test_account_number, int(row["account_number"]))
 

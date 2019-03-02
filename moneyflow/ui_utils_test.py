@@ -1,7 +1,7 @@
 """Tests for ui_utils.py."""
 
 import datetime
-import mock
+from unittest import mock
 
 from google.apputils import basetest
 import categories_lib

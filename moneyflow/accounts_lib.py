@@ -37,7 +37,7 @@ class Account(object):
 
   def __init__(self, name, number):
     """Instantiate an account given the account parameters."""
-    if not isinstance(name, basestring):
+    if not isinstance(name, str):
       raise ValueError("Argument 'name' must be a string.")
     if not isinstance(number, int):
       raise ValueError("Argument 'number' must be a int.")

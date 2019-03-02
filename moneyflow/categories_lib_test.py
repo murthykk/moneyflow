@@ -1,7 +1,7 @@
 """Tests for categories_lib."""
 
 import datetime
-import mock
+from unittest import mock
 
 import categories_lib
 
@@ -36,7 +36,7 @@ class CategoriesTableTest(basetest.TestCase):
     self._categories.Add(cat)
     self._categories.Save()
 
-    row = self._fake_storage._ReadRows().next()
+    row = next(self._fake_storage._ReadRows())
     self.assertEqual(test_description, row["transaction_description"])
     self.assertEqual(test_display_name, row["display_name"])
     self.assertEqual(test_category, row["category"])

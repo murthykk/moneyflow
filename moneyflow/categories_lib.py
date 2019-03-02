@@ -64,11 +64,11 @@ class Category(object):
   is_new = False
 
   def __init__(self, transaction_description, display_name, category):
-    if not isinstance(transaction_description, basestring):
+    if not isinstance(transaction_description, str):
       raise ValueError("Argument 'transaction_description' must be a string.")
-    if not isinstance(display_name, basestring):
+    if not isinstance(display_name, str):
       raise ValueError("Argument 'display_name' must be a string.")
-    if not isinstance(category, basestring):
+    if not isinstance(category, str):
       raise ValueError("Argument 'category' must be a string.")
     self.transaction_description = transaction_description
     self.display_name = display_name

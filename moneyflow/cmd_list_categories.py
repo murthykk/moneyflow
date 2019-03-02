@@ -11,6 +11,6 @@ class CmdListCategories(appcommands.Cmd):
   def Run(self, argv):
     categories = categories_lib.CategoriesTable()
     categories.ReadAll(overwrite=True)
-    print "The following transaction categories exist:"
+    print("The following transaction categories exist:")
     for cat_name in categories.GetSortedCategoryNames():
-      print cat_name
+      print(cat_name)

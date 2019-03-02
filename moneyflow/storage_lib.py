@@ -93,12 +93,12 @@ class ObjectStorage(object):
     """Print information about objects."""
     table = [a.tolist() for a in self._objects]
     if len(table) == 0:
-      print "No object found."
+      print("No object found.")
     else:
       table = [
           self._obj_cls.getlistheadings(*self._table_headings)] + table
-      print tabulate.tabulate(
-          table, headers="firstrow", tablefmt="psql")
+      print(tabulate.tabulate(
+          table, headers="firstrow", tablefmt="psql"))
 
   def __len__(self):
     return len(self._objects)
@@ -261,10 +261,10 @@ class StorageTable(object):
     for row in self._buffer:
       if len(self._columns) != len(row.keys()):
         raise Error("Number of cols does not match buffer. Cols: %r, Buffer: %r"
-                    % (self._columns, row.keys()))
+                    % (self._columns, list(row.keys())))
       if set(self._columns) != set(row.keys()):
         raise Error("Columns do not match buffer. Cols: %r, Buffer: %r"
-            % (self._columns, row.keys()))
+            % (self._columns, list(row.keys())))
 
   def _ReadRows(self):
     """Generator that returns one row at a time.
@@ -293,8 +293,8 @@ class StorageTableIterator(StorageTable):
   def __init__(self, table):
     self._rowgenerator = table._ReadRows()
 
-  def next(self):
-    next_row = self._rowgenerator.next()
+  def __next__(self):
+    next_row = next(self._rowgenerator)
     if not next_row:
       raise StopIteration
     return next_row
@@ -355,5 +355,5 @@ class CsvTable(StorageTable):
     with open(self.file_path, "r") as f:
       reader = csv.DictReader(f, fieldnames=self._columns)
       # Skip header
-      reader.next()
+      next(reader)
       return list(reader)

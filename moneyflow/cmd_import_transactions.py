@@ -43,33 +43,33 @@ class CmdImportTransactions(appcommands.Cmd):
       else:
         error = True
     if error:
-      print "ERROR: Invalid transactions were found during import. Exiting."
+      print("ERROR: Invalid transactions were found during import. Exiting.")
       return
 
     # Prompt user and save transactions.
     if len(transactions) > 0:
-      print "The following new transactions will be saved:"
+      print("The following new transactions will be saved:")
       transactions.Print()
       if ui_utils.PromptUser("Save these transactions?"):
         transactions.Save()
-        print "Done."
-        print "Starting transaction categorization."
+        print("Done.")
+        print("Starting transaction categorization.")
         ui_utils.CategorizeTransactions(transactions.objects)
       else:
-        print "Transactions not saved."
+        print("Transactions not saved.")
     else:
-      print "No new transactions found."
+      print("No new transactions found.")
 
   def _CheckIfNewTransactionIsValid(self, transaction, account_nums):
     """Checks if a new transaction is valid. Returns True or False."""
     if transaction.account_num not in account_nums:
-      print "ERROR: Unknown account number for transaction {}.".format(
-          transaction)
+      print("ERROR: Unknown account number for transaction {}.".format(
+          transaction))
       return False
     return True
 
   def _FilterTransaction(self, transaction, existing_transactions):
     if transaction in existing_transactions:
-      print "Transaction alraedy exists: {}.".format(transaction)
+      print("Transaction alraedy exists: {}.".format(transaction))
       return False
     return True

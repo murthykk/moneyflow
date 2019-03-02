@@ -3,7 +3,7 @@
 import os
 import csv
 import json
-import mock
+from unittest import mock
 import uuid
 
 import storage_lib
@@ -144,8 +144,8 @@ class CsvTableTest(basetest.TestCase):
     with open(self._csv_table.file_path, "r") as f:
       reader = csv.DictReader(f)
       self.assertSameElements(reader.fieldnames, self._columns)
-      row1 = reader.next()
-      row2 = reader.next()
+      row1 = next(reader)
+      row2 = next(reader)
       for idx,col in enumerate(self._columns):
         self.assertEqual(data1[idx], row1[col])
       for idx,col in enumerate(self._columns):
@@ -157,8 +157,8 @@ class CsvTableTest(basetest.TestCase):
     exp_row2 = ["data", "to", "read"]
     with open(table.file_path, "r") as f:
       reader = csv.DictReader(f)
-      row1 = reader.next()
-      row2 = reader.next()
+      row1 = next(reader)
+      row2 = next(reader)
       for idx,exp in enumerate(exp_row1):
         self.assertEqual(exp, row1[self._columns[idx]])
       for idx,exp in enumerate(exp_row2):

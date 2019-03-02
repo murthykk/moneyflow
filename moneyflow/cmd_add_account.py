@@ -16,15 +16,15 @@ class CmdAddAccount(appcommands.Cmd):
   def Run(self, argv):
     accounts = accounts_lib.AccountsTable()
     accounts.ReadAll(overwrite=True)
-    print "Current accounts:"
+    print("Current accounts:")
     accounts.Print()
     accounts.Add(self._GetAccountFromUser())
-    print "New set of accounts:"
+    print("New set of accounts:")
     accounts.Print()
     if ui_utils.PromptUser("Are you sure you want to save these accounts?"):
       accounts.Save()
     else:
-      print "Accounts not saved."
+      print("Accounts not saved.")
 
   def _GetAccountFromUser(self):
     """Returns an Account object based on data gathered from user.
@@ -41,7 +41,7 @@ class CmdAddAccount(appcommands.Cmd):
     return accounts_lib.Account(name, int(number))
 
   def _GetAccountNameFromUser(self):
-    return raw_input("Enter account name: ")
+    return input("Enter account name: ")
 
   def _GetAccountNumberFromUser(self):
-    return raw_input("Enter account number: ")
+    return input("Enter account number: ")
