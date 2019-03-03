@@ -5,11 +5,27 @@ load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 
 git_repository(
+    name = "io_bazel_rules_python",
+    remote = "https://github.com/bazelbuild/rules_python.git",
+    # NOT VALID!  Replace this with a Git commit SHA.
+    commit = "{HEAD}",
+)
+
+git_repository(
     name = "absl",
     remote = "https://github.com/abseil/abseil-py.git",
     tag = "pypi-v0.7.0",
 )
 
+http_archive(
+    name = "tabulate_archive",
+    urls = [
+        "https://files.pythonhosted.org/packages/c2/fd/202954b3f0eb896c53b7b6f07390851b1fd2ca84aa95880d7ae4f434c4ac/tabulate-0.8.3.tar.gz",
+    ],
+    sha256 = "8af07a39377cee1103a5c8b3330a421c2d99b9141e9cc5ddd2e3263fea416943",
+    strip_prefix = "tabulate-0.8.3",
+    build_file = "@//third_party:tabulate.BUILD",
+)
 
 # The following are defined in absl-py's WORKSPACE file, but for some reason,
 # Bazel doesn't fetch them. So, clone them here.

@@ -1,15 +1,17 @@
-"""Set of classes tha handle data storage.
+"""Set of classes that handle data storage.
 
 Note: none of the classes below are thread-safe.
 """
 
 import os
-from collections import deque
 import csv
 import json
-import gflags as flags
 import shutil
 import tabulate
+
+#import gflags as flags
+from absl import flags
+from collections import deque
 
 
 STORAGE_TYPES = ["csv"]

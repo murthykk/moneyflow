@@ -3,19 +3,23 @@
 import os
 import csv
 import json
-from unittest import mock
 import uuid
 
 import storage_lib
-import gflags as flags
-from google.apputils import basetest
 import test_utils
 
+from absl import logging
+
+#from google.apputils import basetest
+#import gflags as flags
+from absl import flags
+from absl.testing import absltest
+from unittest import mock
 
 FLAGS = flags.FLAGS
 
 
-class StorageTableTest(basetest.TestCase):
+class StorageTableTest(absltest.TestCase):
   """Tests StorageTable base class."""
 
   def setUp(self):
@@ -94,7 +98,7 @@ class StorageTableTest(basetest.TestCase):
     self.assertSameElements(self._fake_rows, iter_rows)
 
 
-class CsvTableTest(basetest.TestCase):
+class CsvTableTest(absltest.TestCase):
   """Tests CsvTable subclass."""
 
   _table_name = "test_table"
@@ -166,4 +170,4 @@ class CsvTableTest(basetest.TestCase):
 
 
 if __name__ == "__main__":
-  basetest.main()
+  absltest.main()
