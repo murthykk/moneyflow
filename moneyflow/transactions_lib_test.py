@@ -1,20 +1,20 @@
 """Tests for transactions_lib."""
 
-import os
-import datetime
-from unittest import mock
-
 import transactions_lib
 
-from google.apputils import basetest
-import gflags as flags
+import os
+import datetime
+import mock
 import test_utils
+
+from absl import flags
+from absl.testing import absltest
 
 
 FLAGS = flags.FLAGS
 
 
-class TransactionsTableTest(basetest.TestCase):
+class TransactionsTableTest(absltest.TestCase):
 
   def setUp(self):
     self._fake_storage = test_utils.FakeStorageTable(
@@ -90,11 +90,11 @@ class TransactionsTableTest(basetest.TestCase):
     self.assertTrue(txn2 in s)
 
 
-class ImportTransactionsTest(basetest.TestCase):
+class ImportTransactionsTest(absltest.TestCase):
 
   def testImport(self):
     file_path = os.path.join(
-        os.path.dirname(__file__), "testdata/test_import.ofx")
+        FLAGS.test_srcdir, "moneyflow/moneyflow/testdata/test_import.ofx")
     transactions = transactions_lib.ImportTransactions(file_path)
     self.assertEqual(1, len(transactions))
     t = transactions[0]
@@ -106,4 +106,4 @@ class ImportTransactionsTest(basetest.TestCase):
 
 
 if __name__ == "__main__":
-  basetest.main()
+  absltest.main()

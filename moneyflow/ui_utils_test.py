@@ -1,16 +1,16 @@
 """Tests for ui_utils.py."""
 
 import datetime
-from unittest import mock
-
-from google.apputils import basetest
 import categories_lib
+import mock
 import test_utils
 import transactions_lib
 import ui_utils
 
+from absl.testing import absltest
 
-class UserInputTests(basetest.TestCase):
+
+class UserInputTests(absltest.TestCase):
   """Tests methods that get input from user in ui_utils module."""
 
   @mock.patch("__builtin__.raw_input", return_value="y")
@@ -44,7 +44,7 @@ class UserInputTests(basetest.TestCase):
     self.assertEqual(transaction_desc, cat.transaction_description)
 
 
-class CategorizationTests(basetest.TestCase):
+class CategorizationTests(absltest.TestCase):
   """Tests transaction categorization logic."""
 
   @classmethod
@@ -139,4 +139,4 @@ class CategorizationTests(basetest.TestCase):
 
 
 if __name__ == "__main__":
-  basetest.main()
+  absltest.main()

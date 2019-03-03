@@ -1,20 +1,16 @@
 """Tests for categories_lib."""
 
-import datetime
-from unittest import mock
-
 import categories_lib
 
-from google.apputils import basetest
-import gflags as flags
+import datetime
+import mock
 import test_utils
 import transactions_lib
 
+from absl.testing import absltest
 
-FLAGS = flags.FLAGS
 
-
-class CategoriesTableTest(basetest.TestCase):
+class CategoriesTableTest(absltest.TestCase):
 
   def setUp(self):
     self._fake_storage = test_utils.FakeStorageTable(
@@ -80,4 +76,4 @@ class CategoriesTableTest(basetest.TestCase):
 
 
 if __name__ == "__main__":
-  basetest.main()
+  absltest.main()

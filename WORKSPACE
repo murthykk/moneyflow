@@ -2,14 +2,7 @@
 workspace(name = "moneyflow")
 
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
-load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
-
-git_repository(
-    name = "io_bazel_rules_python",
-    remote = "https://github.com/bazelbuild/rules_python.git",
-    # NOT VALID!  Replace this with a Git commit SHA.
-    commit = "{HEAD}",
-)
+load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository", "new_git_repository")
 
 git_repository(
     name = "absl_git",
@@ -25,6 +18,23 @@ http_archive(
     sha256 = "8af07a39377cee1103a5c8b3330a421c2d99b9141e9cc5ddd2e3263fea416943",
     strip_prefix = "tabulate-0.8.3",
     build_file = "@//third_party:tabulate.BUILD",
+)
+
+http_archive(
+    name = "beautiful_soup_archive",
+    urls = [
+        "https://files.pythonhosted.org/packages/80/f2/f6aca7f1b209bb9a7ef069d68813b091c8c3620642b568dac4eb0e507748/beautifulsoup4-4.7.1.tar.gz"
+    ],
+    sha256 = "945065979fb8529dd2f37dbb58f00b661bdbcbebf954f93b32fdf5263ef35348",
+    strip_prefix = "beautifulsoup4-4.7.1",
+    build_file = "@//third_party:beautiful_soup.BUILD",
+)
+
+new_git_repository(
+    name = "ofxparse_git",
+    remote = "https://github.com/jseutter/ofxparse.git",
+    tag = "0.20",
+    build_file = "@//third_party:ofxparse.BUILD",
 )
 
 # The following are defined in absl-py's WORKSPACE file, but for some reason,

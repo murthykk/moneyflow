@@ -1,10 +1,10 @@
 """Library of objects to access tranactions data."""
 
 import datetime
-from collections import deque
 import ofxparse
 import storage_lib
 
+from collections import deque
 
 TRANSACTION_DATE_FORMAT = "%Y-%m-%d"
 
