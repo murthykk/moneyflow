@@ -295,7 +295,8 @@ class StorageTableIterator(StorageTable):
   def __init__(self, table):
     self._rowgenerator = table._ReadRows()
 
-  def __next__(self):
+  # TODO(py2to3): Change this to __next__.
+  def next(self):
     next_row = next(self._rowgenerator)
     if not next_row:
       raise StopIteration

@@ -155,7 +155,9 @@ class CsvTableTest(absltest.TestCase):
         self.assertEqual(data2[idx], row2[col])
 
   def testRead(self):
-    table = self._GetCsvTable("testdata/test_read.csv")
+    table = self._GetCsvTable(
+        os.path.join(FLAGS.test_srcdir,
+                     "moneyflow/moneyflow/testdata/test_read.csv"))
     exp_row1 = ["132", "12312", "12048"]
     exp_row2 = ["data", "to", "read"]
     with open(table.file_path, "r") as f:

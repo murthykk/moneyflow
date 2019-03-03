@@ -17,7 +17,10 @@ py_library(
 py_test(
     name = "storage_lib_test",
     srcs = ["storage_lib_test.py"],
+    # This should be PY3 compatible, but absl throws an error: no module named
+    # enum.
     python_version = "PY2",
+    data = ["testdata/test_read.csv"],
     deps = [
         ":moneyflow",
         "@absl_git//absl/flags",
