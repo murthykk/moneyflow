@@ -1,6 +1,6 @@
 # ofxparse deserializes Open Financial Exchange files.
 
-licenses(["notice"])  # BSD
+licenses(["notice"])  # MIT
 
 exports_files(["LICENSE"])
 

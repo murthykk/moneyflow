@@ -1,6 +1,6 @@
 # Tabulate is a library for pretty printing tables.
 
-licenses(["notice"])  # BSD
+licenses(["notice"])  # MIT
 
 exports_files(["LICENSE"])
 

@@ -1,6 +1,6 @@
 # Beautiful soup.
 
-licenses(["notice"])  # BSD
+licenses(["notice"])  # MIT
 
 exports_files(["LICENSE"])
 
