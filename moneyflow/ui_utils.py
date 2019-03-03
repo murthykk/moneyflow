@@ -8,7 +8,7 @@ import tabulate
 
 def PromptUser(msg):
   while True:
-    ans = input("{} [Y/n]: ".format(msg)).upper()
+    ans = raw_input("{} [Y/n]: ".format(msg)).upper()
     if ans == "Y":
       return True
     elif ans == "N":
@@ -32,7 +32,7 @@ def GetIntegerFromUser(msg, lower, upper):
   Raises:
     ValueError: If user entered invalid input.
   """
-  idx = input("{} [{} - {}]: ".format(msg, lower, upper))
+  idx = raw_input("{} [{} - {}]: ".format(msg, lower, upper))
   idx = int(idx)
   if idx < lower or idx > upper:
     raise ValueError(
@@ -160,8 +160,8 @@ def GetCategoryFromUser(transaction_description):
     "What is the category associated with transactions that have the following "
     "description?")
   print(transaction_description)
-  category = input("Enter the category's name: ")
-  display_name = input("Enter the display name for the transaction: ")
+  category = raw_input("Enter the category's name: ")
+  display_name = raw_input("Enter the display name for the transaction: ")
   return categories_lib.Category(
       transaction_description, display_name, category)
 
