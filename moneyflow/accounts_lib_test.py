@@ -1,17 +1,17 @@
 """Tests for accounts_lib."""
 
-from unittest import mock
-
 import accounts_lib
-from google.apputils import basetest
-import gflags as flags
+
+import mock
 import test_utils
 
+from absl import flags
+from absl.testing import absltest
 
 FLAGS = flags.FLAGS
 
 
-class AccountsListTest(basetest.TestCase):
+class AccountsListTest(absltest.TestCase):
 
   def setUp(self):
     self._fake_storage = test_utils.FakeStorageTable(
@@ -57,4 +57,4 @@ class AccountsListTest(basetest.TestCase):
 
 
 if __name__ == "__main__":
-  basetest.main()
+  absltest.main()

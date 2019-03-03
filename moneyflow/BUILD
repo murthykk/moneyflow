@@ -28,3 +28,29 @@ py_test(
         "@mock_archive//:mock",
     ],
 )
+
+py_test(
+    name = "accounts_lib_test",
+    srcs = ["accounts_lib_test.py"],
+    # This should be PY3 compatible, but absl throws an error: no module named
+    # enum.
+    python_version = "PY2",
+    deps = [
+        ":moneyflow",
+        "@absl_git//absl/testing:absltest",
+        "@mock_archive//:mock",
+    ],
+)
+
+#py_test(
+#    name = "ui_utils_test",
+#    srcs = ["ui_utils_test.py"],
+#    # This should be PY3 compatible, but absl throws an error: no module named
+#    # enum.
+#    python_version = "PY2",
+#    deps = [
+#        ":moneyflow",
+#        "@absl_git//absl/testing:absltest",
+#        "@mock_archive//:mock",
+#    ],
+#)
