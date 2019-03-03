@@ -59,7 +59,7 @@ class Transaction(object):
       raise ValueError("Argument 'date' must be a datetime.date object.")
     if not isinstance(account_num, int):
       raise ValueError("Argument 'account_num' must be an int.")
-    if not isinstance(description, str):
+    if not (isinstance(description, str) or isinstance(description, basestring)):
       raise ValueError("Argument 'description' must be a string.")
     if not isinstance(amount, float):
       raise ValueError("Argument 'amount' must be a float.")
