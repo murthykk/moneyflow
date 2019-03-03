@@ -3,18 +3,17 @@
 import os
 import csv
 import json
+import mock
 import uuid
 
 import storage_lib
 import test_utils
 
-from absl import logging
-
 #from google.apputils import basetest
 #import gflags as flags
 from absl import flags
 from absl.testing import absltest
-from unittest import mock
+#from unittest import mock
 
 FLAGS = flags.FLAGS
 

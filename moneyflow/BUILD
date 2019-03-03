@@ -9,7 +9,7 @@ py_library(
     ],
     srcs_version = "PY2AND3",
     deps = [
-        "@absl//absl/flags",
+        "@absl_git//absl/flags",
         "@tabulate_archive//:tabulate",
     ],
 )
@@ -17,9 +17,11 @@ py_library(
 py_test(
     name = "storage_lib_test",
     srcs = ["storage_lib_test.py"],
-    python_version = "PY3",
+    python_version = "PY2",
     deps = [
         ":moneyflow",
-        "@absl//absl/flags",
+        "@absl_git//absl/flags",
+        "@absl_git//absl/testing:absltest",
+        "@mock_archive//:mock",
     ],
 )

@@ -12,7 +12,7 @@ git_repository(
 )
 
 git_repository(
-    name = "absl",
+    name = "absl_git",
     remote = "https://github.com/abseil/abseil-py.git",
     tag = "pypi-v0.7.0",
 )
