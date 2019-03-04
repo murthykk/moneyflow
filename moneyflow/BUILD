@@ -8,6 +8,7 @@ py_library(
         "ui_utils.py",
     ],
     srcs_version = "PY2AND3",
+    visibility = ["//visibility:public"],
     deps = [
         "@absl_git//absl/flags",
         "@tabulate_archive//:tabulate",

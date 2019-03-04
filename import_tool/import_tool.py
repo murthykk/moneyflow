@@ -1,13 +1,13 @@
-"""Main budget script. Controls CSV ingest and adding new vendors/categories."""
+"""Main budget import script. Controls CSV ingest and adding new vendors/categories."""
 
-
-from google.apputils import appcommands
 import cmd_add_account
 import cmd_categorize
 import cmd_export_data
 import cmd_list_categories
 import cmd_print_accounts
 import cmd_import_transactions
+
+from third_party import appcommands
 
 
 def main(argv):
