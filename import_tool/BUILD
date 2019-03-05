@@ -6,5 +6,7 @@ py_binary(
     deps = [
         "//moneyflow",
         "//third_party:appcommands",
+        "@absl_git//absl/flags",
+        "@tabulate_archive//:tabulate",
     ]
 )

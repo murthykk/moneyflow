@@ -1,12 +1,10 @@
 """Command for adding a new account."""
 
-
 import re
-
-import accounts_lib
 import tabulate
-import ui_utils
 
+from moneyflow import accounts_lib
+from moneyflow import ui_utils
 from third_party import appcommands
 
 

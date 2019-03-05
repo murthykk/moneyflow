@@ -1,9 +1,8 @@
 """Command for categorizing transactions."""
 
-
-from google.apputils import appcommands
-import transactions_lib
-import ui_utils
+from moneyflow import transactions_lib
+from moneyflow import ui_utils
+from third_party import appcommands
 
 
 class CmdCategorize(appcommands.Cmd):

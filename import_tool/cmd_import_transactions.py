@@ -2,14 +2,14 @@
 
 import os
 import re
-
-from google.apputils import appcommands
-import gflags as flags
-import accounts_lib
-import categories_lib
-import transactions_lib
 import tabulate
-import ui_utils
+
+from absl import flags
+from moneyflow import accounts_lib
+from moneyflow import categories_lib
+from moneyflow import transactions_lib
+from moneyflow import ui_utils
+from third_party import appcommands
 
 
 FLAGS = flags.FLAGS

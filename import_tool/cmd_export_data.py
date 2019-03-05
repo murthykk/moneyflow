@@ -2,13 +2,13 @@
 
 import csv
 import os
-
 from collections import deque
-from google.apputils import appcommands
-import gflags as flags
-import accounts_lib
-import transactions_lib
-import categories_lib
+
+from absl import flags
+from moneyflow import accounts_lib
+from moneyflow import transactions_lib
+from moneyflow import categories_lib
+from third_party import appcommands
 
 
 FLAGS = flags.FLAGS

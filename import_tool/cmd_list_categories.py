@@ -1,8 +1,7 @@
 """Lists categories in the system."""
 
-
-from google.apputils import appcommands
-import categories_lib
+from moneyflow import categories_lib
+from third_party import appcommands
 
 
 class CmdListCategories(appcommands.Cmd):
