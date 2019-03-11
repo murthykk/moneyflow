@@ -22,7 +22,7 @@ class CmdImportTransactions(appcommands.Cmd):
     flags.DEFINE_string(
         "ofx_file_path", None, "OFX file containing transaction data.",
         flag_values=flag_values)
-    flags.MarkFlagAsRequired("ofx_file_path", flag_values=flag_values)
+    flags.mark_flag_as_required("ofx_file_path", flag_values=flag_values)
     super(CmdImportTransactions, self).__init__(name, flag_values, **kwargs)
 
   def Run(self, argv):

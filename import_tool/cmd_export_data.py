@@ -21,7 +21,7 @@ class CmdExportData(appcommands.Cmd):
     flags.DEFINE_string(
         "output_path", None, "Path for output csv file.",
         flag_values=flag_values)
-    flags.MarkFlagAsRequired("output_path", flag_values=flag_values)
+    flags.mark_flag_as_required("output_path", flag_values=flag_values)
     super(CmdExportData, self).__init__(name, flag_values, **kwargs)
 
   def Run(self, unused_argv):
