@@ -5,6 +5,7 @@ py_binary(
     srcs = ["jupyter.py"],
     deps = [
         "//moneyflow",
+        "@absl_git//absl/flags",
         requirement("notebook"),
         requirement("jupyter_core"),
         requirement("tornado"),
