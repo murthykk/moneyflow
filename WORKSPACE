@@ -21,6 +21,26 @@ http_archive(
 )
 
 http_archive(
+    name = "lru_cache_archive",
+    urls = [
+        "https://files.pythonhosted.org/packages/57/d4/156eb5fbb08d2e85ab0a632e2bebdad355798dece07d4752f66a8d02d1ea/backports.functools_lru_cache-1.5.tar.gz",
+    ],
+    sha256 = "9d98697f088eb1b0fa451391f91afb5e3ebde16bbdb272819fd091151fda4f1a",
+    strip_prefix = "backports.functools_lru_cache-1.5",
+    build_file = "@//third_party:lru_cache.BUILD",
+)
+
+http_archive(
+    name = "soupsieve_archive",
+    urls = [
+        "https://files.pythonhosted.org/packages/0c/52/e9088bb9b96e2d39fc3b33fcda5b4fde9d71473536ac660a1ca9a0958a2f/soupsieve-1.8.tar.gz",
+    ],
+    sha256 = "eaed742b48b1f3e2d45ba6f79401b2ed5dc33b2123dfe216adb90d4bfa0ade26",
+    strip_prefix = "soupsieve-1.8",
+    build_file = "@//third_party:soupsieve.BUILD",
+)
+
+http_archive(
     name = "beautiful_soup_archive",
     urls = [
         "https://files.pythonhosted.org/packages/80/f2/f6aca7f1b209bb9a7ef069d68813b091c8c3620642b568dac4eb0e507748/beautifulsoup4-4.7.1.tar.gz"
