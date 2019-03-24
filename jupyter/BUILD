@@ -26,6 +26,7 @@ py_binary(
         requirement("pandocfilters"),
         requirement("testpath"),
         requirement("ipykernel"),
+        requirement("terminado"),
         requirement("pandas"),
         requirement("python-dateutil"),
         requirement("matplotlib"),
