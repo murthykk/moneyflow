@@ -91,3 +91,26 @@ http_archive(
     sha256 = "8ad8c4783bf61ded74527bffb48ed9b54166685e4230386a9ed9b1279e2df5b1",
     build_file = "@//third_party:enum34.BUILD"
 )
+
+# Builds Jupyter using bazel.
+git_repository(
+    name = "io_bazel_rules_python",
+    commit = "965d4b4a63e6462204ae671d7c3f02b25da37941",
+    remote = "https://github.com/bazelbuild/rules_python.git",
+)
+
+# Only needed for PIP support:
+load("@io_bazel_rules_python//python:pip.bzl", "pip_repositories")
+load("@io_bazel_rules_python//python:pip.bzl", "pip_import")
+
+# Requirements for notebooks
+pip_import(
+    name = "jupyter",
+    requirements = "//jupyter:requirements.txt",
+)
+
+load(
+    "@jupyter//:requirements.bzl",
+    _notebooks_install = "pip_install",
+)
+_notebooks_install()
