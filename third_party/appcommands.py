@@ -704,7 +704,14 @@ def ParseFlagsWithUsage(argv):
   # pylint: disable=global-statement
   global _cmd_argv
   try:
-    _cmd_argv = FLAGS(argv)
+    # This original line now raises if an unknown flag exists. However, this
+    # function is called multiple times: once for global flags and once for
+    # command flags. At the time the global flags are parsed, the command flags
+    # haven't yet been registered. So, in the global flag call, we want to have
+    # the function return all remaining command flags. Thus, specify
+    # "known_only=True".
+    #_cmd_argv = FLAGS(argv)
+    _cmd_argv = FLAGS(argv, known_only=True)
     return _cmd_argv
   except flags.Error, error:
     ShortHelpAndExit('FATAL Flags parsing error: %s' % error)
