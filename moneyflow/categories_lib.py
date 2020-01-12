@@ -9,7 +9,7 @@ class CategoriesTable(storage_lib.ObjectStorage):
   def __init__(self):
     super(CategoriesTable, self).__init__(
         "categories", Category,
-        ["Transaction Description", "Display Name", "Category"])
+        ["Transaction Description", "Display Name", "Category", "Regex?"])
     self._description_map = None
 
   def GetSortedCategoryNames(self):
@@ -105,7 +105,7 @@ class Category(object):
     return {
         "transaction_description": self.transaction_description,
         "display_name": self.display_name,
-        "category": self.category
+        "category": self.category,
         "is_regex": self.is_regex
     }
 
