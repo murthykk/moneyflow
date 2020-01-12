@@ -9,6 +9,6 @@
   },
   "categories": {
     "rel_path": "categories.csv",
-    "columns": ["transaction_description", "display_name", "category"]
+    "columns": ["transaction_description", "display_name", "category", "is_regex"]
   }
 }
