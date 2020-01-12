@@ -15,7 +15,7 @@ class CategoriesTableTest(absltest.TestCase):
   def setUp(self):
     self._fake_storage = test_utils.FakeStorageTable(
         "cateogories",
-        ["transaction_description", "display_name", "category"])
+        ["transaction_description", "display_name", "category", "is_regex"])
     mock.patch.object(
         categories_lib.storage_lib, "GetStorageTable",
         return_value=self._fake_storage).start()
@@ -26,9 +26,10 @@ class CategoriesTableTest(absltest.TestCase):
     test_description = "This is some transaction"
     test_display_name = "AwesomeTransaction"
     test_category = "Goodness"
+    test_is_regex = True
 
     cat = categories_lib.Category(
-        test_description, test_display_name, test_category)
+        test_description, test_display_name, test_category, test_is_regex)
     self._categories.Add(cat)
     self._categories.Save()
 
@@ -36,6 +37,7 @@ class CategoriesTableTest(absltest.TestCase):
     self.assertEqual(test_description, row["transaction_description"])
     self.assertEqual(test_display_name, row["display_name"])
     self.assertEqual(test_category, row["category"])
+    self.assertEqual(test_is_regex, row["is_regex"])
 
   def testPrint(self):
     test_description = "This is a printed transaction"
@@ -45,6 +47,8 @@ class CategoriesTableTest(absltest.TestCase):
         categories_lib.Category(
             test_description, test_display_name, test_category))
     self._categories.Print()
+
+  # TODO: update tests below for regex searching
 
   def testGetCategoryForTransaction(self):
     test_description = "This transaction should be found"
