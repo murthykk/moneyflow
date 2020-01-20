@@ -36,12 +36,15 @@ class UserInputTests(absltest.TestCase):
       ui_utils.GetIntegerFromUser("get int", 1, 5)
 
   @mock.patch("__builtin__.raw_input", side_effect=["test cat", "disp name"])
-  def testGetCategoryFromUser(self, unused):
+  @mock.patch("ui_utils.PromptUser", return_value=False)  # Decline regex cat.
+  def testGetCategoryFromUser(self, unused1, unused2):
     transaction_desc = "test trans desc"
-    cat = ui_utils.GetCategoryFromUser(transaction_desc)
+    cat = ui_utils._GetCategoryFromUser(transaction_desc)
     self.assertEqual("test cat", cat.category)
     self.assertEqual("disp name", cat.display_name)
     self.assertEqual(transaction_desc, cat.transaction_description)
+
+  # TODO: add regex cat unit tests, includinig success and fail where NOne is returned.
 
 
 class CategorizationTests(absltest.TestCase):
@@ -103,7 +106,7 @@ class CategorizationTests(absltest.TestCase):
     new_cat = categories_lib.Category(
             "uncategorized desc", "new disp", "new_cat")
 
-    with mock.patch("ui_utils.GetCategoryFromUser", return_value=new_cat):
+    with mock.patch("ui_utils._GetCategoryFromUser", return_value=new_cat):
       self.assertTrue(
           ui_utils.AddCategoriesToTransactions(cat_table, transactions))
 
@@ -122,6 +125,8 @@ class CategorizationTests(absltest.TestCase):
 
     # Make sure the right category information was added.
     self.assertDictEqual(new_cat.todict(), added_cat.todict())
+
+  # TODO: add a test where _GetCategoryFromUser returns None.
 
   @mock.patch("ui_utils.PromptUser", return_value=False)
   def testAddCategoriesToTransactions_NotEverythingCategorized(self, unused):

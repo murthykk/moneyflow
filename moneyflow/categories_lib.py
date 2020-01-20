@@ -1,22 +1,61 @@
 """Library of objects to access transaction categories."""
 
+import re
 import storage_lib
+
+def CompileRegex(regex_string):
+  return re.compile(regex_string, re.IGNORECASE)
+
+
+def MatchRegexObj(regex, transaction_description):
+  """Returns true if the regex matches the transaction description.
+
+  Args:
+    regex: Compiled regex object.
+
+  Returns:
+    True if the regex matches the transaction description, using re.match().
+
+  Raises:
+    ValueError if regex is not a re.RegexObject.
+  """
+  if not isinstance(regex, re.RegexObject):
+    raise ValueError("'regex' must be a RegexObject.")
+  m = regex.match(transaction_description)
+  return bool(m)
+
+
+def MatchRegexStr(regex_str, transaction_description):
+  """Returns True if the regex string matches the transaction descrption.
+
+  Args:
+    regex_str: Regex string.
+
+  Returns:
+    True if the regex matches the transaction description, using re.match().
+  """
+  r = CompileRegex(regex_str)
+  return MatchRegexObj(r, transaction_description)
+
 
 class CategoriesTable(storage_lib.ObjectStorage):
 
   _description_map = None
+  """Dict that maps transation descriptions to table indices."""
+
+  _regexes = None
+  """List of tuples containing regex objects and the associated table indices."""
 
   def __init__(self):
     super(CategoriesTable, self).__init__(
         "categories", Category,
         ["Transaction Description", "Display Name", "Category", "Regex?"])
     self._description_map = None
+    self._regexes = None
 
   def GetSortedCategoryNames(self):
     """Returns a sorted iterable of all categories that exist in the table."""
-    return sorted(list(set(
-        [cat.category for cat in self.objects]
-    )))
+    return sorted(set(cat.category for cat in self.objects))
 
   def InitializeCategoryLookup(self):
     """Initializes the object to lookup categories.
@@ -28,10 +67,35 @@ class CategoriesTable(storage_lib.ObjectStorage):
     TOOD(murthykk): Do this on instantiation to make this class RAII. If
     there's a method to add categories to an existing table instance,
     add new map entries at the end of the method.
+
+    Raises:
+      RuntimeError: if an invalid regex category was found.
     """
-    self._description_map = {
-      cat.transaction_description: idx for idx,cat in enumerate(self.objects)
-    }
+    self._description_map = {}
+    self._regexes = []
+    for idx, cat in enumerate(self.objects):
+      if not cat.is_regex:
+        self._description_map[cat.transaction_description] = idx
+      else:
+        try:
+          # TODO: may need to use re.IGNORECASE here.
+          self._regexes.append(
+              (CompileRegex(cat.transaction_description), idx))
+        except re.error as e:
+          raise RuntimeError("Found invalid regular expression: %s" % e.pattern)
+
+  def _MatchRegexes(self, transaction_description):
+    """Returns a Category that regex-matches the transaction_description.
+
+    If no regexes match, returns None.
+
+    Args:
+      transaction_description: the transaction description string.
+    """
+    for r, idx in self._regexes:
+      if MatchRegexObj(r, transaction_description):
+        return self.objects[idx]
+    return None
 
   def GetCategoryForTransaction(self, transaction):
     """Returns the category for the given transaction object.
@@ -56,23 +120,12 @@ class CategoriesTable(storage_lib.ObjectStorage):
     if transaction.description in self._description_map:
       return self.objects[self._description_map[transaction.description]]
     else:
-      return None
+      return self._MatchRegexes(transaction.description)
 
 
 class Category(object):
   """Container for category data."""
 
-  # TODO: The transaction descrioption can just be a regex match. Shoiuld compile it as a Python regex first to see if it works.
-  # If not, then just use exact match.
-  #
-  # The tricky bit will be: what happens when multiple categories match a single transaction? This hasn't happened 
-  # previously since the description_map unique-ifies the associated transaction description, and the descriptions need to 
-  # match exactly. This will essentially end up matching a transaction to the first category. We could continue this but it's
-  # more dangerous with regex, as something like (*) can match everything. It would be worth warning if a transaction 
-  # matches to more than one category.
-  #
-  # Actually, the issue with regex is that they can't be applied using the fast hashing lookup that currently 
-  # matches categories. So, regex have to be tracked separately.
   transaction_description = ""
   display_name = ""
   category = ""
@@ -83,7 +136,7 @@ class Category(object):
   # Required for all storage objects. This should be in a superclass.
   is_new = False
 
-  def __init__(self, transaction_description, display_name, category, is_regex=False):
+  def __init__(self, transaction_description, display_name, category, is_regex=None):
     if not isinstance(transaction_description, str):
       raise ValueError("Argument 'transaction_description' must be a string.")
     if not isinstance(display_name, str):

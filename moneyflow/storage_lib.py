@@ -52,6 +52,12 @@ class ObjectStorage(object):
     fromdict
     tolist
     getlistheadings
+
+  The construction of this object is backed by a StorageTable containing
+  the ability to access serialized objects. Use ObjectStorage.ReadAll() to
+  deserialize the data in the storage table. Use the Add() and Save() methods
+  to add new objects to the storage table and serialize/save the new objects to
+  disk.
   """
 
   _objects = deque()
