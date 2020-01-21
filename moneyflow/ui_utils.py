@@ -165,7 +165,7 @@ def _PrintRegexCategoryInfo(re_cat, transactions_table, categories_table):
   # matching transaction.
   matching_transaction_cats = deque()
 
-  regex = categories_lib.CompileRegex(re_cat.transaction_description)
+  regex = categories_lib.CompiledRegex(re_cat.transaction_description)
   for transaction in transactions_table.objects:
     if categories_lib.MatchRegexObj(regex, transaction.description):
       matching_transactions.append(transaction)

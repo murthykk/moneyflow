@@ -3,10 +3,19 @@
 import re
 import storage_lib
 
-_REGEX_OBJ_TYPE = type(re.compile(''))
 
-def CompileRegex(regex_string):
-  return re.compile(regex_string, re.IGNORECASE)
+class CompiledRegex(object):
+  """Thin wrapper around regex compilation for transaction description matching.
+
+  Enforces that all matching ignores case.
+  """
+
+  def __init__(self, regex_string):
+    self._r = re.compile(regex_string, re.IGNORECASE)
+
+  def match(self, match_str):
+    """Wrapper around re.match(). Returns a match object."""
+    return self._r.match(match_str)
 
 
 def MatchRegexObj(regex, transaction_description):
@@ -21,8 +30,8 @@ def MatchRegexObj(regex, transaction_description):
   Raises:
     ValueError if regex is not a re.RegexObject.
   """
-  if not isinstance(regex, _REGEX_OBJ_TYPE):
-    raise ValueError("'regex' must be a RegexObject.")
+  if not isinstance(regex, CompiledRegex):
+    raise ValueError("'regex' must be a CompiledRegex.")
   m = regex.match(transaction_description)
   return bool(m)
 
@@ -36,8 +45,7 @@ def MatchRegexStr(regex_str, transaction_description):
   Returns:
     True if the regex matches the transaction description, using re.match().
   """
-  r = CompileRegex(regex_str)
-  return MatchRegexObj(r, transaction_description)
+  return MatchRegexObj(CompiledRegex(regex_str), transaction_description)
 
 
 class CategoriesTable(storage_lib.ObjectStorage):
@@ -81,7 +89,7 @@ class CategoriesTable(storage_lib.ObjectStorage):
       else:
         try:
           self._regexes.append(
-              (CompileRegex(cat.transaction_description), idx))
+              (CompiledRegex(cat.transaction_description), idx))
         except re.error as e:
           raise RuntimeError("Found invalid regular expression: %s" % e.pattern)
 
