@@ -1,6 +1,5 @@
 """Utilities that help interface with users."""
 
-import re
 from collections import deque
 import tabulate
 
@@ -80,9 +79,9 @@ def AddCategoriesToTransactions(cat_table, transactions):
     True if all transactions have categories. False if some transactions
     remain uncategorized.
   """
-  # Cached table of all existing transactions in case the user enters a new
-  # regex category before. In this case, it should be checked against all
-  # existing transactions.
+  # Cached table of all existing transactions and new ones passed into this
+  # function. in case the user enters a new regex category. The new regex's
+  # matching should be checked against these transactions.
   transactions_table = None
   while True:
     # For every transaction, check if a category exists.
@@ -96,7 +95,7 @@ def AddCategoriesToTransactions(cat_table, transactions):
         categories.append(cat)
 
     print("Uncategorized transactions and their categories:")
-    PrintTransactionCategories(list(zip(uncat_txns, categories)))
+    PrintTransactionCategories(zip(uncat_txns, categories))
 
     if None not in set(categories):
       print("All transactions have categories - quitting categorization.")
@@ -110,14 +109,20 @@ def AddCategoriesToTransactions(cat_table, transactions):
         idx -= 1
         cat = _GetCategoryFromUser(uncat_txns[idx].description)
         if cat is None:
+          # There was a problem when the user was entering the category. Go back
+          # to the top of the loop.
           continue
-        # If the category is a regex, print additional info that will help
+        # If the new category is a regex, print additional info that will help
         # the user make a decision about whether to keep it.
         if cat.is_regex:
+          # Cache the transactions table. Load all existing transactions and
+          # add the new ones passed into this function.
           if transactions_table is None:
             transactions_table = transactions_lib.TransactionsTable()
             transactions_table.ReadAll(overwrite=True)
-          _PrintRegexCategoryInfo(cat, transactions_table)
+            for txn in transactions:
+              transactions_table.Add(txn)
+          _PrintRegexCategoryInfo(cat, transactions_table, cat_table)
       except ValueError as e:
         print("Invalid input. Problem: %s" % str(e))
         continue
@@ -133,61 +138,102 @@ def AddCategoriesToTransactions(cat_table, transactions):
       return False
 
 
-def _PrintRegexCategoryInfo(category, transactions_table):
+def _PrintRegexCategoryInfo(re_cat, transactions_table, categories_table):
   """Prints info that helps the user verify a regex category.
 
   Args:
-    category: A regex category, where category.is_regex is True.
+    re_cat: A regex category(categories_lib.Category), where category.is_regex
+      is True.
     transactions_table: A fully populated transactions_lib.TransactionsTable
-      that will be used to verify the regex category with the user.
+      that will be used to verify the regex category with the user. Matching
+      transactions with the new regex category will be printed.
+    categories_table: A fully populated categories_lib.CategoriesTable with
+      existing categories. Conflicts between the regex categories and these
+      categories will be printed.
 
   Raises:
     ValueError: if category.is_regex is False.
   """
-  if not category.is_regex:
+  if not re_cat.is_regex:
     raise ValueError("category.is_regex must be True.")
-  matching_transactions = transactions_lib.TransactionsTable()
-  regex = categories_lib.CompileRegex(category.transaction_description)
+  categories_table.InitializeCategoryLookup()
+
+  # List of transactions that match the regex.
+  matching_transactions = deque()
+
+  # List of currently matching categories in the CategoriesTable for each
+  # matching transaction.
+  matching_transaction_cats = deque()
+
+  regex = categories_lib.CompileRegex(re_cat.transaction_description)
   for transaction in transactions_table.objects:
     if categories_lib.MatchRegexObj(regex, transaction.description):
-      matching_transactions.Add(transaction)
-    # TODO: Also find other existing categories that match this same transaction.
+      matching_transactions.append(transaction)
+      matching_transaction_cats.append(
+          categories_table.GetCategoryForTransaction(transaction))
 
-  print("Transactions that match the regex category (%s):" %
-        category.transaction_description)
-  matching_transactions.Print()
+  if matching_transactions:
+    print("Transactions that match the regex category (%s) and their existing "
+          "matching categories:" % re_cat.transaction_description)
+    PrintTransactionCategories(
+        zip(matching_transactions, matching_transaction_cats),
+        print_regex_col=True)
+    print("Note that exact matches to transactions will take precedence over "
+          "regex transactions.")
 
 
-def PrintTransactionCategories(transactions_and_categories):
+def PrintTransactionCategories(
+    transactions_and_categories, print_regex_col=False):
   """Prints categories associated with each transaction.
 
   Args:
     transactions_and_categories: Iterable of Transaction object + Category
-        object tuples.
+      object tuples.
+    print_regex_col: If True, prints regexes in categories that were associated
+      with transactions.
   """
   if len(transactions_and_categories) == 0:
     return
 
+  def get_regex_col(cat):
+    """Returns the regex string for a regex category
+
+    Returns "None" if not a regex cat.
+
+    Args:
+      cat: A categories_lib.Category object.
+    """
+    return cat.transaction_description if cat.is_regex else "None"
+
   def get_cols(t):
-    """Returns a list of strings from rows in a joined transaction/category."""
+    """Returns a list of strings from rows in a joined transaction/category.
+
+    Args:
+      t: tuple of (Transaction, Optional[Category]) objects.
+    """
     txn = t[0].todict()
-    if t[1] is not None:
-      cat = t[1].todict()
+    cat = t[1]
+    if cat is not None:
+      cat_dict = cat.todict()
       return [
         txn["transaction_date"],
         txn["transaction_description"],
         txn["transaction_amount"],
-        cat["category"]
-      ]
+        cat_dict["category"]
+      ] + [get_regex_col(cat)] if print_regex_col else []
     else:
       return [
         txn["transaction_date"],
         txn["transaction_description"],
         txn["transaction_amount"],
         "None"
-      ]
+      ] + ["None"] if print_regex_col else []
 
-  table = [["Index", "Date", "Description", "Amount", "Category"]] + [
+  table_headings = [
+      "Index", "Date", "Description", "Amount", "Category"
+  ] + ["Regex"] if print_regex_col else []
+
+  table = [table_headings] + [
     [idx + 1] + get_cols(t) for idx,t in enumerate(transactions_and_categories)
     ]
 
@@ -208,9 +254,9 @@ def _GetRegexCategory(transaction_description):
   """
   while True:
     regex = raw_input("Enter regex (Python syntax): ")
-    if categories_lib.MatchRegexStr(regex):
+    if categories_lib.MatchRegexStr(regex, transaction_description):
       return regex
-    print("Regex %s does not match transaction description.")
+    print("Regex '%s' does not match transaction description." % regex)
     if not PromptUser("Try again?"):
       return None
 

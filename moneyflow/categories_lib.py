@@ -3,6 +3,8 @@
 import re
 import storage_lib
 
+_REGEX_OBJ_TYPE = type(re.compile(''))
+
 def CompileRegex(regex_string):
   return re.compile(regex_string, re.IGNORECASE)
 
@@ -19,7 +21,7 @@ def MatchRegexObj(regex, transaction_description):
   Raises:
     ValueError if regex is not a re.RegexObject.
   """
-  if not isinstance(regex, re.RegexObject):
+  if not isinstance(regex, _REGEX_OBJ_TYPE):
     raise ValueError("'regex' must be a RegexObject.")
   m = regex.match(transaction_description)
   return bool(m)
@@ -78,7 +80,6 @@ class CategoriesTable(storage_lib.ObjectStorage):
         self._description_map[cat.transaction_description] = idx
       else:
         try:
-          # TODO: may need to use re.IGNORECASE here.
           self._regexes.append(
               (CompileRegex(cat.transaction_description), idx))
         except re.error as e:
@@ -131,7 +132,10 @@ class Category(object):
   category = ""
 
   is_regex = False
-  """True if the transaction_description is a regex instead of an exact match."""
+  """True if the transaction_description is a regex instead of an exact match.
+  
+  The regex matching ignores case.
+  """
 
   # Required for all storage objects. This should be in a superclass.
   is_new = False
@@ -159,7 +163,7 @@ class Category(object):
         "transaction_description": self.transaction_description,
         "display_name": self.display_name,
         "category": self.category,
-        "is_regex": self.is_regex
+        "is_regex": str(self.is_regex)
     }
 
   def to_native_dict(self):
@@ -168,11 +172,14 @@ class Category(object):
   @classmethod
   def fromdict(cls, row):
     return cls(
-        row["transaction_description"], row["display_name"], row["category"], row["is_regex"])
+        row["transaction_description"], row["display_name"], row["category"],
+        bool(row["is_regex"]))
 
   def tolist(self):
-    return [self.transaction_description, self.display_name, self.category, self.is_regex]
+    return [self.transaction_description, self.display_name, self.category,
+            self.is_regex]
 
   @classmethod
-  def getlistheadings(cls, transaction_description, display_name, category, is_regex):
+  def getlistheadings(
+      cls, transaction_description, display_name, category, is_regex):
     return [transaction_description, display_name, category, is_regex]
