@@ -1,5 +1,6 @@
 """Library of objects to access transaction categories."""
 
+import ast
 import re
 import storage_lib
 
@@ -181,7 +182,7 @@ class Category(object):
   def fromdict(cls, row):
     return cls(
         row["transaction_description"], row["display_name"], row["category"],
-        bool(row["is_regex"]))
+        row["is_regex"].lower() == 'true')
 
   def tolist(self):
     return [self.transaction_description, self.display_name, self.category,

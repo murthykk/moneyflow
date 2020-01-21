@@ -220,14 +220,14 @@ def PrintTransactionCategories(
         txn["transaction_description"],
         txn["transaction_amount"],
         cat_dict["category"]
-      ] + [get_regex_col(cat)] if print_regex_col else []
+      ] + ([get_regex_col(cat)] if print_regex_col else [])
     else:
       return [
         txn["transaction_date"],
         txn["transaction_description"],
         txn["transaction_amount"],
         "None"
-      ] + ["None"] if print_regex_col else []
+      ] + (["None"] if print_regex_col else [])
 
   table_headings = [
       "Index", "Date", "Description", "Amount", "Category"
