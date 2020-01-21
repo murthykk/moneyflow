@@ -37,7 +37,7 @@ class CategoriesTableTest(absltest.TestCase):
     self.assertEqual(test_description, row["transaction_description"])
     self.assertEqual(test_display_name, row["display_name"])
     self.assertEqual(test_category, row["category"])
-    self.assertEqual(test_is_regex, row["is_regex"])
+    self.assertEqual(test_is_regex, bool(row["is_regex"]))
 
   def testPrint(self):
     test_description = "This is a printed transaction"
@@ -48,8 +48,6 @@ class CategoriesTableTest(absltest.TestCase):
             test_description, test_display_name, test_category))
     self._categories.Print()
 
-  # TODO: update tests below for regex searching
-
   def testGetCategoryForTransaction(self):
     test_description = "This transaction should be found"
     test_display_name = "KnownTransaction"
@@ -57,8 +55,8 @@ class CategoriesTableTest(absltest.TestCase):
     self._categories.Add(
         categories_lib.Category(
             test_description, test_display_name, test_category))
-    self._categories.InitializeCategoryLookup()
 
+    self._categories.InitializeCategoryLookup()
     cat = self._categories.GetCategoryForTransaction(
         transactions_lib.Transaction(
             0, datetime.date(2008, 3, 4), test_description, 0.0))
@@ -71,12 +69,79 @@ class CategoriesTableTest(absltest.TestCase):
     self._categories.Add(
         categories_lib.Category(
             test_description, test_display_name, test_category))
-    self._categories.InitializeCategoryLookup()
 
+    self._categories.InitializeCategoryLookup()
     cat = self._categories.GetCategoryForTransaction(
         transactions_lib.Transaction(
             0, datetime.date(2008, 3, 4), "Unknown description",0.0))
     self.assertIsNone(cat)
+
+  def testGetCategoryForTransaction_Regex(self):
+    test_description = "Transaction regex and more"
+    test_regex = "Transaction regex"
+    test_display_name = "AnotherTransaction"
+    test_category = "SomeCategory"
+    self._categories.Add(
+        categories_lib.Category(
+            test_regex, test_display_name, test_category, is_regex=True))
+
+    self._categories.InitializeCategoryLookup()
+    cat = self._categories.GetCategoryForTransaction(
+        transactions_lib.Transaction(
+            0, datetime.date(2008, 3, 4), test_description, 0.0))
+    self.assertEqual(test_category, cat.category)
+
+  def testGetCategoryForTransaction_RegexIgnoresCase(self):
+    test_description = "tRANSACTION REGEX aND mOre"
+    test_regex = "transaction regex"
+    test_display_name = "AnotherTransaction"
+    test_category = "SomeCategory"
+    self._categories.Add(
+        categories_lib.Category(
+            test_regex, test_display_name, test_category, is_regex=True))
+
+    self._categories.InitializeCategoryLookup()
+    cat = self._categories.GetCategoryForTransaction(
+        transactions_lib.Transaction(
+            0, datetime.date(2008, 3, 4), test_description, 0.0))
+    self.assertEqual(test_category, cat.category)
+
+  def testGetCategoryForTransaction_RegexDoesntMatch(self):
+    test_description = "Transaction regex"
+    test_display_name = "AnotherTransaction"
+    test_category = "SomeCategory"
+    self._categories.Add(
+        categories_lib.Category(
+            test_description, test_display_name, test_category, is_regex=True))
+
+    self._categories.InitializeCategoryLookup()
+    cat = self._categories.GetCategoryForTransaction(
+        transactions_lib.Transaction(
+            0, datetime.date(2008, 3, 4), "Transaction", 0.0))
+    self.assertIsNone(cat)
+
+  def testGetCategoryForTransaction_ExactMatchOverRegex(self):
+    """Tests that exact match category takes precedence over a regex match."""
+    test_description = "Transaction regex and more"
+    test_regex = "Transaction regex"
+    test_display_name = "AnotherTransaction"
+    regex_category = "RegexCategory"
+    exact_category = "ExactCategory"
+
+    # Add a regex category and an exact match category.
+    self._categories.Add(
+        categories_lib.Category(
+            test_regex, test_display_name, regex_category, is_regex=True))
+    self._categories.Add(
+        categories_lib.Category(
+            test_description, test_display_name, exact_category,
+            is_regex=False))
+
+    self._categories.InitializeCategoryLookup()
+    cat = self._categories.GetCategoryForTransaction(
+        transactions_lib.Transaction(
+            0, datetime.date(2008, 3, 4), test_description, 0.0))
+    self.assertEqual(exact_category, cat.category)
 
 
 if __name__ == "__main__":
