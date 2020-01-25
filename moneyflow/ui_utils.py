@@ -105,8 +105,9 @@ def AddCategoriesToTransactions(cat_table, transactions):
     if PromptUser("Add a category?"):
       try:
         idx = GetIntegerFromUser(
-            "Select a transaction index", 1, len(uncat_txns))
-        idx -= 1
+            "Select a transaction index", 1, len(uncat_txns)) - 1
+        print("Selected transaction:")
+        PrintTransactionCategories(((uncat_txns[idx], None),))
         cat = _GetCategoryFromUser(uncat_txns[idx].description)
         if cat is None:
           # There was a problem when the user was entering the category. Go back
@@ -177,13 +178,13 @@ def _PrintRegexCategoryInfo(re_cat, transactions_table, categories_table):
           "matching categories:" % re_cat.transaction_description)
     PrintTransactionCategories(
         zip(matching_transactions, matching_transaction_cats),
-        print_regex_col=True)
+        print_regex_col=True, sort_by_date=True)
     print("Note that exact matches to transactions will take precedence over "
           "regex transactions.")
 
 
 def PrintTransactionCategories(
-    transactions_and_categories, print_regex_col=False):
+    transactions_and_categories, print_regex_col=False, sort_by_date=False):
   """Prints categories associated with each transaction.
 
   Args:
@@ -191,9 +192,14 @@ def PrintTransactionCategories(
       object tuples.
     print_regex_col: If True, prints regexes in categories that were associated
       with transactions.
+    sort_by_date: If True, sorts the transactions by date, in ascending order.
   """
-  if len(transactions_and_categories) == 0:
+  if not transactions_and_categories:
     return
+
+  if sort_by_date:
+    transactions_and_categories = sorted(
+        transactions_and_categories, key=lambda x: x[0].date)
 
   def get_regex_col(cat):
     """Returns the regex string for a regex category
@@ -253,10 +259,13 @@ def _GetRegexCategory(transaction_description):
     user canceled.
   """
   while True:
-    regex = raw_input("Enter regex (Python syntax): ")
-    if categories_lib.MatchRegexStr(regex, transaction_description):
+    regex = raw_input("Enter a Python regex that matches '%s': " %
+                      transaction_description)
+    if regex and categories_lib.MatchRegexStr(regex, transaction_description):
       return regex
     print("Regex '%s' does not match transaction description." % regex)
+    print("Tips: case does not matter, and matching special characters such as "
+          ".  ^ $ * + ? \ | should be surrounded by square brackets.")
     if not PromptUser("Try again?"):
       return None
 
@@ -267,17 +276,15 @@ def _GetCategoryFromUser(transaction_description):
   Returns None if the user canceled.
   """
   is_regex = False
-  if PromptUser("Enter regex for transaction description?"):
+  if PromptUser("Enter regex?"):
     regex = _GetRegexCategory(transaction_description)
     if regex is None:
       return None
     transaction_description = regex
     is_regex = True
   else:
-    print(
-      "What is the category associated with transactions that have the following "
-      "description?")
-    print(transaction_description)
+    print("What is the category associated with transactions that have the "
+          "description: %s" % transaction_description)
   category = raw_input("Enter the category's name: ")
   display_name = raw_input("Enter the display name for the transaction: ")
   return categories_lib.Category(
