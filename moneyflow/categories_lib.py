@@ -150,7 +150,7 @@ class Category(object):
   is_new = False
 
   def __init__(self, transaction_description, display_name, category, is_regex=None):
-    if not isinstance(transaction_description, str):
+    if not isinstance(transaction_description, basestring):
       raise ValueError("Argument 'transaction_description' must be a string.")
     if not isinstance(display_name, str):
       raise ValueError("Argument 'display_name' must be a string.")
