@@ -120,9 +120,10 @@ def AddCategoriesToTransactions(cat_table, transactions):
           # add the new ones passed into this function.
           if transactions_table is None:
             transactions_table = transactions_lib.TransactionsTable()
-            transactions_table.ReadAll(overwrite=True)
+            all_transactions = set(transactions_table.ReadAll(overwrite=True))
             for txn in transactions:
-              transactions_table.Add(txn)
+              if txn not in all_transactions:
+                transactions_table.Add(txn)
           _PrintRegexCategoryInfo(cat, transactions_table, cat_table)
       except ValueError as e:
         print("Invalid input. Problem: %s" % str(e))
