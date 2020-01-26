@@ -52,8 +52,11 @@ class CmdExportData(appcommands.Cmd):
     acct = accounts_table.GetAccountForTransaction(transaction)
     cat = categories_table.GetCategoryForTransaction(transaction)
 
+    # TODO: combine this with joining code in ui_utils. Maybe make table joining utils.
+    # TODO: make list_transactions subcommand, which joins and prints the same stuff as what's here.
+    # TODO: add regexes.
     if not acct:
-      a = acct.tostringdict()
+      a = acct.todict()
       acct_cols = [
         a["account_name"]
       ]
@@ -61,7 +64,7 @@ class CmdExportData(appcommands.Cmd):
       acct_cols = [None]
 
     if not cat:
-      c = cat.tostringdict()
+      c = cat.todict()
       cat_cols = [
         c["category"],
         c["display_name"]
