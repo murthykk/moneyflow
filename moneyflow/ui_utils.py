@@ -242,7 +242,7 @@ def PrintTransactionCategories(
 
   table = [table_headings] + [
     [idx + 1] + get_cols(t) for idx,t in enumerate(transactions_and_categories)
-    ]
+  ]
 
   print(tabulate.tabulate(table, headers="firstrow", tablefmt="psql"))
 
