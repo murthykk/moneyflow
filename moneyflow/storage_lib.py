@@ -44,6 +44,8 @@ def GetStorageTable(table_name):
 # TODO: Unit test this class and remove subclass unit tests.
 # TODO: Make an object base class and make it clear what subclasses need to
 # implement.
+# TODO: Avoid having to load the underlying CSV data every time a new
+# ObjectStorage subclass is instantiated.
 class ObjectStorage(object):
   """Accesses deserialized objects from a storage backend.
 
@@ -52,6 +54,12 @@ class ObjectStorage(object):
     fromdict
     tolist
     getlistheadings
+
+  The construction of this object is backed by a StorageTable containing
+  the ability to access serialized objects. Use ObjectStorage.ReadAll() to
+  deserialize the data in the storage table. Use the Add() and Save() methods
+  to add new objects to the storage table and serialize/save the new objects to
+  disk.
   """
 
   _objects = deque()
